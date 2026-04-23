@@ -1,0 +1,32 @@
+{
+  "context": {
+    "fileName": [
+      "AGENTS.md",
+      "GEMINI.md"
+    ]
+  },
+  "mcpServers": {
+    "vibe-specs": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "vibedev-specs-mcp@latest"
+      ],
+      "env": {},
+      "working_directory": null
+    },
+    "Context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest"
+      ]
+    },
+    "Deepwiki": {
+      "url": "https://mcp.deepwiki.com/sse",
+      "headers": {},
+      "timeout": 30,
+      "sse_read_timeout": 300
+    }
+  }
+}

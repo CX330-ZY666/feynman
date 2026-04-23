@@ -1,0 +1,362 @@
+/* FeynmanRecordPage.css - 复述知识点页面美化样式 */
+
+.feynman-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* 页面头部 */
+.feynman-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
+}
+
+.feynman-header .back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+  transition: color 0.2s;
+}
+
+.feynman-header .back-link:hover {
+  color: white;
+}
+
+.feynman-header h1 {
+  color: white !important;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.feynman-header h1 span,
+.feynman-header h1 .kp-title,
+.feynman-header .kp-title {
+  color: white !important;
+  -webkit-text-fill-color: white !important;
+}
+
+/* 错误提示 */
+.feynman-error {
+  background: linear-gradient(135deg, #fef2f2, #fff);
+  border: 1px solid #fecaca;
+  border-left: 4px solid #dc2626;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  color: #dc2626;
+}
+
+/* 录音区域卡片 */
+.recorder-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+}
+
+/* 提交按钮区 */
+.submit-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn-evaluate {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-evaluate:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.btn-evaluate:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.submit-hint {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+/* AI反馈区域 */
+.feedback-section {
+  margin-top: 2rem;
+  border-top: 2px solid #e5e7eb;
+  padding-top: 2rem;
+}
+
+.feedback-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.5rem;
+  color: #1f2937;
+  margin: 0 0 1.5rem 0;
+}
+
+/* AI加载动画 */
+.ai-loading {
+  text-align: center;
+  padding: 2.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  color: white;
+}
+
+.ai-loading-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.ai-loading-text {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: 0.5rem 0;
+}
+
+.ai-loading-hint {
+  font-size: 0.9rem;
+  opacity: 0.85;
+  margin: 0.5rem 0;
+}
+
+.ai-loading-badge {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  font-size: 0.85rem;
+}
+
+/* 错误重试 */
+.error-retry {
+  padding: 1.25rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+}
+
+.error-retry p {
+  color: #dc2626;
+  margin: 0 0 0.75rem 0;
+}
+
+.btn-retry {
+  padding: 0.5rem 1rem;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* 保存选项区 */
+.save-options {
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.25rem;
+  background: #ecfeff;
+  border: 1px solid #a5f3fc;
+  border-radius: 12px;
+}
+
+.save-options-inner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.save-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.btn-save {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-save:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
+.btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.save-msg {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.save-msg.success { color: #10b981; }
+.save-msg.error { color: #dc2626; }
+
+/* 重评估提示 */
+.reevaluate-hint {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f3f4f6;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.reevaluate-hint span {
+  font-size: 0.95rem;
+  color: #374151;
+}
+
+.btn-reevaluate {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-reevaluate:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+}
+
+/* 反馈内容布局 */
+.feedback-content {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.feedback-main {
+  flex: 1 1 400px;
+}
+
+.feedback-score {
+  flex: 0 0 180px;
+  text-align: center;
+  align-self: flex-start;
+  position: sticky;
+  top: 20px;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+}
+
+.feedback-score h3 {
+  margin: 0 0 1rem 0;
+  color: #374151;
+}
+
+.score-value {
+  font-size: 4rem;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.score-value.high { color: #10b981; }
+.score-value.low { color: #f59e0b; }
+
+.score-max {
+  color: #6b7280;
+  margin-top: 0.5rem;
+}
+
+.review-warning {
+  margin-top: 1rem;
+  padding: 0.5rem;
+  background: #fef3c7;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #92400e;
+}
+
+/* 反馈卡片 */
+.feedback-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid #e5e7eb;
+}
+
+.feedback-card h3 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.1rem;
+  color: #374151;
+}
+
+.feedback-card.standard {
+  background: #f8fafc;
+}
+
+.feedback-card.polished {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.feedback-card p,
+.feedback-card ul {
+  line-height: 1.7;
+  margin: 0;
+}
+
+.feedback-card ul {
+  padding-left: 1.5rem;
+}
+
+.feedback-card li {
+  margin-bottom: 0.5rem;
+}

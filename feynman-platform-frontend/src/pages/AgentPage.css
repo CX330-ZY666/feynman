@@ -1,0 +1,335 @@
+/* src/pages/AgentPage.css */
+
+/* 页面容器 */
+.agent-page {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 90px);
+  max-width: 900px;
+  margin: 0 auto;
+  background: #f8fafc;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* 页面头部 */
+.agent-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.agent-header-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.agent-avatar {
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  backdrop-filter: blur(4px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.agent-info h1 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: white;
+  font-weight: 600;
+}
+
+.agent-info p {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.agent-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.agent-status .status-dot {
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* 聊天窗口 */
+.chat-window {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+/* 消息行 —— 全部加 .agent-page 前缀避免与 FeynmanPracticePage.css 冲突 */
+.agent-page .message {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  animation: messageIn 0.3s ease;
+  /* 重置 FeynmanPracticePage.css 的污染规则 */
+  background: none;
+  padding: 0;
+  max-width: 100%;
+  border-radius: 0;
+  color: inherit;
+}
+
+@keyframes messageIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.agent-page .message.user {
+  flex-direction: row-reverse;
+  align-self: auto;
+  background: none;
+}
+
+.agent-page .message-avatar {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.agent-page .message-avatar.user-avatar {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.agent-page .message-content {
+  max-width: 70%;
+}
+
+.agent-page .message-bubble {
+  padding: 0.85rem 1.15rem;
+  border-radius: 18px;
+  line-height: 1.6;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.agent-page .message.user .message-bubble {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.agent-page .message.bot .message-bubble {
+  background: white;
+  color: #374151;
+  border-bottom-left-radius: 4px;
+  border: 1px solid #e5e7eb;
+}
+
+/* 参考来源 */
+.message-sources {
+  margin-top: 0.75rem;
+  padding: 0.85rem;
+  background: white;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.message-sources details {
+  cursor: pointer;
+}
+
+.message-sources summary {
+  font-weight: 600;
+  color: #667eea;
+  margin-bottom: 0.5rem;
+  padding: 0.25rem 0;
+}
+
+.message-sources summary:hover {
+  color: #764ba2;
+}
+
+.source-item {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-left: 3px solid #667eea;
+  border-radius: 6px;
+}
+
+.source-item strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: #667eea;
+  font-size: 0.8rem;
+}
+
+.source-item p {
+  margin: 0;
+  color: #64748b;
+  white-space: pre-wrap;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+/* 输入表单 */
+.chat-input-form {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: white;
+  border-top: 1px solid #e5e7eb;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.input-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+.chat-input-form input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.85rem 1.25rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 25px;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+  background: #f8fafc;
+}
+
+.chat-input-form input:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.chat-input-form input::placeholder {
+  color: #9ca3af;
+}
+
+.chat-input-form button {
+  padding: 0.85rem 1.5rem;
+  border: none;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.3s;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.chat-input-form button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.chat-input-form button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.chat-input-form button:disabled {
+  background: linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* 打字指示器动画 */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.5rem 0;
+}
+
+.typing-indicator span {
+  height: 8px;
+  width: 8px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: inline-block;
+  animation: bob 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-of-type(1) {
+  animation-delay: 0s;
+}
+
+.typing-indicator span:nth-of-type(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-of-type(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes bob {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+/* 滚动条美化 */
+.chat-window::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-window::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-window::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.chat-window::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}

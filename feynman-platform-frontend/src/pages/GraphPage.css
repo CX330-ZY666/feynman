@@ -1,0 +1,419 @@
+/* GraphPage.css - Immersive Redesign */
+
+/* ========== 1. Fullscreen Container ========== */
+.graph-page-container {
+  position: relative;
+  width: 100vw;
+  height: calc(100vh - 64px); /* Adjust for global navbar height */
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 50%, #fdfbf7 0%, #f3f4f6 100%);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* ========== 2. Background Canvas Layer ========== */
+.graph-canvas-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  cursor: grab;
+}
+
+.graph-canvas-layer:active {
+  cursor: grabbing;
+}
+
+/* ========== 3. UI Overlay Layer ========== */
+.graph-ui-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  pointer-events: none; /* Let clicks pass through to canvas */
+}
+
+/* Common Glassmorphism Panel Style */
+.graph-glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  pointer-events: auto; /* Re-enable clicks */
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* ========== 4. Floating Header (Top Bar) ========== */
+.graph-floating-header {
+  position: absolute;
+  top: 16px;
+  left: 24px;
+  right: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  height: 64px;
+}
+
+.graph-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.graph-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.graph-stats-pill {
+  display: flex;
+  gap: 12px;
+  padding: 4px 12px;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.graph-stats-pill b {
+  color: #374151;
+}
+
+/* Search Bar (Spotlight Style) */
+.graph-search-container {
+  position: relative;
+  width: 320px;
+}
+
+.graph-search-input {
+  width: 100%;
+  padding: 10px 16px 10px 40px;
+  border-radius: 24px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.5);
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.graph-search-input:focus {
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  width: 360px;
+}
+
+.graph-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  font-size: 1rem;
+}
+
+.graph-search-clear {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.1);
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #666;
+}
+
+.graph-search-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  padding: 6px;
+  z-index: 100;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.graph-search-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.graph-search-item:hover {
+  background: #f3f4f6;
+}
+
+/* Header Actions */
+.graph-header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.graph-btn {
+  border: none;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.graph-btn:active {
+  transform: scale(0.98);
+}
+
+.graph-btn-primary {
+  background: #4f46e5;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.graph-btn-primary:hover {
+  background: #4338ca;
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4);
+}
+
+.graph-btn-secondary {
+  background: rgba(255, 255, 255, 0.8);
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+}
+
+.graph-btn-secondary:hover {
+  background: #fff;
+  color: #111827;
+}
+
+/* ========== 5. Floating Legend (Bottom Left) ========== */
+.graph-floating-legend {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 180px;
+}
+
+.legend-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9ca3af;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
+}
+
+/* ========== 6. Node Inspector (Right Slide-over) ========== */
+.graph-inspector-panel {
+  position: absolute;
+  top: 96px; /* Below header */
+  right: 24px;
+  bottom: 24px;
+  width: 320px;
+  transform: translateX(360px); /* Hidden by default */
+  opacity: 0;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+}
+
+.graph-inspector-panel.open {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.inspector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.inspector-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #111827;
+  line-height: 1.3;
+}
+
+.inspector-close {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 1.2rem;
+  transition: color 0.2s;
+}
+
+.inspector-close:hover {
+  color: #4b5563;
+}
+
+.inspector-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.meta-val {
+  font-weight: 600;
+  color: #374151;
+}
+
+.inspector-desc {
+  font-size: 0.95rem;
+  color: #4b5563;
+  line-height: 1.6;
+  max-height: 200px;
+  overflow-y: auto;
+  background: rgba(243, 244, 246, 0.6);
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.inspector-actions {
+  margin-top: auto; /* Push to bottom */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.action-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.action-btn.edit {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  color: #374151;
+}
+
+.action-btn.edit:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.action-btn.feynman {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.action-btn.feynman:hover {
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Empty State */
+.graph-empty-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  padding: 40px;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 16px;
+  display: block;
+}
+
+/* Loading */
+.graph-loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(4px);
+  z-index: 50;
+  flex-direction: column;
+  gap: 16px;
+  color: #6b7280;
+}
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #4f46e5;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

@@ -1,0 +1,10 @@
+.env
+node_modules/
+uploads/
+ffmpeg-8.0-essentials_build/
+vector_store_backup/
+whisper-api/
+tmp/
+*.log
+.vercel
+.env*.local

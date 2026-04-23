@@ -1,0 +1,90 @@
+{
+  "name": "feynman-platform-frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "electron.mjs",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && cross-env ELECTRON_START_URL=http://localhost:5173 electron .\"",
+    "electron:build": "npm run build && electron-builder"
+  },
+  "dependencies": {
+    "@tiptap/extension-code-block": "^3.10.7",
+    "@tiptap/extension-placeholder": "^3.10.7",
+    "@tiptap/extension-table": "^3.10.7",
+    "@tiptap/extension-table-cell": "^3.10.7",
+    "@tiptap/extension-table-header": "^3.10.7",
+    "@tiptap/extension-table-row": "^3.10.7",
+    "@tiptap/extension-typography": "^3.10.7",
+    "@tiptap/react": "^3.10.7",
+    "@tiptap/starter-kit": "^3.10.7",
+    "@uiw/react-md-editor": "^4.0.8",
+    "axios": "^1.12.2",
+    "baidu-aip-sdk": "^4.16.16",
+    "child_process": "^1.0.2",
+    "d3-force": "^3.0.0",
+    "d3-force-3d": "^3.0.6",
+    "dompurify": "^3.3.0",
+    "echarts": "^6.0.0",
+    "echarts-for-react": "^3.0.5",
+    "fs": "^0.0.1-security",
+    "hast-util-sanitize": "^5.0.2",
+    "katex": "^0.16.25",
+    "mermaid": "^11.12.0",
+    "path": "^0.12.7",
+    "quilljs-markdown": "^1.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-katex": "^3.1.0",
+    "react-markdown": "^10.1.0",
+    "react-media-recorder": "^1.7.2",
+    "react-quill": "^2.0.0",
+    "react-router-dom": "^7.9.4",
+    "recordrtc": "^5.6.2",
+    "rehype-katex": "^7.0.1",
+    "rehype-raw": "^7.0.0",
+    "rehype-sanitize": "^6.0.0",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0",
+    "three": "^0.181.2",
+    "tiptap-markdown": "^0.9.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.36.0",
+    "@types/react": "^19.1.16",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react-swc": "^4.1.0",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^39.2.6",
+    "electron-builder": "^26.0.12",
+    "eslint": "^9.36.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.22",
+    "globals": "^16.4.0",
+    "vite": "npm:rolldown-vite@7.1.14",
+    "vite-plugin-pwa": "^1.2.0",
+    "wait-on": "^9.0.3"
+  },
+  "overrides": {
+    "vite": "npm:rolldown-vite@7.1.14"
+  },
+  "build": {
+    "appId": "com.feynman-platform.app",
+    "productName": "Feynman Learning Platform",
+    "files": [
+      "dist/**/*",
+      "electron.mjs"
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "win": {
+      "signAndEditExecutable": false
+    }
+  }
+}

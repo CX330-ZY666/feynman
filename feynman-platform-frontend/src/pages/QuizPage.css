@@ -1,0 +1,478 @@
+/* QuizPage.css - 测评页面美化样式 */
+
+.quiz-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* 页面头部 */
+.quiz-header {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 30px rgba(99, 102, 241, 0.3);
+}
+
+.quiz-header .back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+  transition: color 0.2s;
+}
+
+.quiz-header .back-link:hover {
+  color: white;
+}
+
+.quiz-header h1 {
+  color: white !important;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.quiz-header h1 span,
+.quiz-header h1 .kp-title,
+.quiz-header .kp-title {
+  color: white !important;
+  -webkit-text-fill-color: white !important;
+}
+
+/* 设置卡片 */
+.quiz-settings {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+}
+
+.setting-group {
+  margin-bottom: 1.25rem;
+}
+
+.setting-group:last-child {
+  margin-bottom: 0;
+}
+
+.setting-label {
+  display: block;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.75rem;
+}
+
+/* 题型切换按钮 */
+.type-toggle {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.type-btn {
+  padding: 0.6rem 1.25rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  background: white;
+  color: #374151;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.type-btn:hover:not(:disabled) {
+  border-color: #6366f1;
+  color: #6366f1;
+}
+
+.type-btn.active {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  border-color: #6366f1;
+  color: white;
+}
+
+.type-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 数量输入 */
+.count-input {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.count-input input {
+  width: 80px;
+  padding: 0.6rem 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.count-input input:focus {
+  outline: none;
+  border-color: #6366f1;
+}
+
+.count-hint {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+/* 难度按钮 */
+.difficulty-btns {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.diff-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: white;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.diff-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+.diff-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 加载状态 */
+.quiz-loading {
+  text-align: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.quiz-loading p:first-child {
+  font-size: 1.2rem;
+  color: #6366f1;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.quiz-loading p:last-child {
+  color: #6b7280;
+}
+
+/* 进度条 */
+.progress-card {
+  background: white;
+  padding: 1.25rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.progress-info span:first-child {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.progress-info span:last-child {
+  color: #6b7280;
+}
+
+.progress-bar {
+  background: #e5e7eb;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  height: 100%;
+  transition: width 0.3s;
+}
+
+/* 题目卡片 */
+.question-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+}
+
+.question-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+/* 选项样式 */
+.option-item {
+  margin-bottom: 0.75rem;
+  padding: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.option-item:hover {
+  border-color: #c7d2fe;
+  background: #f5f3ff;
+}
+
+.option-item.selected {
+  border-color: #6366f1;
+  background: #ede9fe;
+}
+
+.option-item input {
+  margin-right: 0.75rem;
+}
+
+.option-item label {
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* 简答题输入 */
+.answer-textarea {
+  width: 100%;
+  min-height: 150px;
+  padding: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.answer-textarea:focus {
+  outline: none;
+  border-color: #6366f1;
+}
+
+/* 操作按钮组 */
+.action-btns {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.btn-group {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.quiz-btn {
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.quiz-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-prev {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.btn-prev:hover:not(:disabled) {
+  background: #d1d5db;
+}
+
+.btn-submit {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.btn-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.btn-next {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: white;
+}
+
+.btn-next:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.btn-restart {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+}
+
+.btn-restart:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+}
+
+/* 完成结果 */
+.result-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 2px solid #6366f1;
+}
+
+.result-title {
+  color: #6366f1;
+  font-size: 1.75rem;
+  margin: 0 0 1.5rem 0;
+}
+
+/* 统计网格 */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-box {
+  padding: 1.25rem;
+  background: #f9fafb;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid #e5e7eb;
+}
+
+.stat-box.correct {
+  background: #d1fae5;
+  border-color: #10b981;
+}
+
+.stat-box.wrong {
+  background: #fee2e2;
+  border-color: #ef4444;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.stat-box.correct .stat-label { color: #065f46; }
+.stat-box.wrong .stat-label { color: #991b1b; }
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #374151;
+}
+
+.stat-box.correct .stat-number { color: #065f46; }
+.stat-box.wrong .stat-number { color: #991b1b; }
+
+/* 正确率展示 */
+.accuracy-box {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  border-radius: 12px;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.accuracy-label {
+  color: white;
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.accuracy-value {
+  color: white;
+  font-size: 3.5rem;
+  font-weight: bold;
+}
+
+/* 题目明细 */
+.detail-section h3 {
+  margin: 0 0 1rem 0;
+  color: #374151;
+}
+
+.detail-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.detail-item {
+  margin-bottom: 1rem;
+  padding: 1.25rem;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 2px solid #e5e7eb;
+}
+
+.detail-item.correct {
+  border-color: #10b981;
+}
+
+.detail-item.wrong {
+  border-color: #ef4444;
+}
+
+/* 复习提示 */
+.review-notice {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: #fef3c7;
+  border-radius: 12px;
+  color: #92400e;
+  font-weight: 500;
+}
+
+/* 底部按钮 */
+.result-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.result-actions .quiz-btn {
+  flex: 1;
+  padding: 1rem;
+}
