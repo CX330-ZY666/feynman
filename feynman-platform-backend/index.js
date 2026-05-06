@@ -69,6 +69,17 @@ const isTrustedFeynmanFrontendOrigin = (origin) => {
   }
 };
 
+const isLocalDevOrigin = (origin) => {
+  try {
+    const { hostname, port } = new URL(origin);
+    const localHosts = new Set(['localhost', '127.0.0.1', '::1', '172.30.207.163']);
+    const localDevPorts = new Set(['5173', '5174', '4173', '3000']);
+    return localHosts.has(hostname) && localDevPorts.has(port);
+  } catch (error) {
+    return false;
+  }
+};
+
 // ==================== 核心中间件配置 ====================
 const corsOptions = {
   origin: (origin, callback) => {
@@ -76,12 +87,9 @@ const corsOptions = {
     if (!origin) return callback(null, true);
 
     // 开发环境默认放行本地前端
-   if (
-  process.env.NODE_ENV !== 'production' &&
-  (origin.includes('localhost') || origin.includes('172.30.207.163'))
-) {
-  return callback(null, true);
-}
+    if (process.env.NODE_ENV !== 'production' && isLocalDevOrigin(origin)) {
+      return callback(null, true);
+    }
     if (originAllowList.has(origin)) {
       return callback(null, true);
     }
@@ -101,9 +109,9 @@ const corsOptions = {
       return callback(null, true);
     }
 
-   if (origin.includes('localhost') || origin.includes('172.30.207.163')) {
-  return callback(null, true);
-}
+    if (isLocalDevOrigin(origin)) {
+      return callback(null, true);
+    }
     return callback(new Error(`CORS blocked for origin: ${origin}`));
   },
 };

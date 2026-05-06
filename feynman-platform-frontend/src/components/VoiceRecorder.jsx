@@ -31,11 +31,7 @@ function VoiceRecorder({ onTranscribeComplete, relatedId, transcribedText, onTex
   const [mediaBlobUrl, setMediaBlobUrl] = useState('');
   
   // 转录方式与失败计数
-  const [transcriptionMethod, setTranscriptionMethod] = useState(() => {
-    const saved = typeof window !== 'undefined' ? localStorage.getItem('transcriptionMethod') : null;
-    const enableWhisper = import.meta?.env?.VITE_ENABLE_WHISPER !== 'false';
-    return saved || (enableWhisper ? 'whisper' : 'baidu');
-  });
+  const [transcriptionMethod, setTranscriptionMethod] = useState('baidu');
   const [failureCount, setFailureCount] = useState(0);
 
   const timerRef = useRef(null);
@@ -150,7 +146,13 @@ function VoiceRecorder({ onTranscribeComplete, relatedId, transcribedText, onTex
     } catch (error) {
       const status = error?.response?.status;
       const suggestion = error?.response?.data?.suggestion || '';
-      const errorMsg =
+      const isBackendOffline =
+        !error?.response &&
+        (error?.code === 'ERR_NETWORK' || String(error?.message || '').toLowerCase().includes('network'));
+
+      const errorMsg = isBackendOffline
+        ? '无法连接后端服务（localhost:3000），请先启动后端'
+        :
         error?.response?.data?.msg ||
         error?.response?.data?.error ||
         error?.message ||

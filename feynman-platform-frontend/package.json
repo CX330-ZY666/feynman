@@ -5,11 +5,11 @@
   "type": "module",
   "main": "electron.mjs",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host 127.0.0.1 --port 5174 --strictPort",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && cross-env ELECTRON_START_URL=http://localhost:5173 electron .\"",
+    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://127.0.0.1:5174 && cross-env ELECTRON_START_URL=http://127.0.0.1:5174 electron .\"",
     "electron:build": "npm run build && electron-builder"
   },
   "dependencies": {

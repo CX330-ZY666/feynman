@@ -30,7 +30,7 @@ start "Feynman Frontend" cmd /k "cd /d %~dp0feynman-platform-frontend && npm run
 echo.
 echo 启动命令已发送：
 echo - Backend: http://localhost:3000
-echo - Frontend: http://localhost:5173
+echo - Frontend: http://127.0.0.1:5174
 echo.
 echo 如首次运行，请先在两个项目目录分别执行 npm install
 pause
