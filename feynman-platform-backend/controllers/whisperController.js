@@ -126,6 +126,7 @@ exports.transcribeAudioLocal = async (req, res) => {
 
   } catch (error) {
     console.error('❌ Whisper 转录失败:', error.message);
+    const shouldDegrade = incrementFailureCount();
 
     // 网络错误或连接失败
     if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') {
@@ -208,10 +209,31 @@ exports.transcribeAudioLocal = async (req, res) => {
 /**
  * 导出降级状态查询接口（用于健康检查）
  */
-exports.getWhisperStatus = (req, res) => {
+exports.getWhisperStatus = async (req, res) => {
+  const whisperApiUrl = process.env.WHISPER_API_URL || 'http://localhost:5001';
+  let serviceReachable = false;
+  let serviceHealth = null;
+
+  try {
+    const healthResponse = await axios.get(`${whisperApiUrl}/health`, { timeout: 3000 });
+    serviceReachable = healthResponse.status >= 200 && healthResponse.status < 300;
+    serviceHealth = healthResponse.data;
+  } catch (error) {
+    serviceReachable = false;
+    serviceHealth = {
+      error: error.message,
+      code: error.code || 'UNKNOWN'
+    };
+  }
+
+  const baseStatus = isDegraded ? 'degraded' : 'healthy';
+  const status = serviceReachable ? baseStatus : 'unavailable';
+
   return res.json({
-    status: isDegraded ? 'degraded' : 'healthy',
+    status,
+    serviceReachable,
+    serviceHealth,
     ...getDegradationStatus(),
-    whisperApiUrl: process.env.WHISPER_API_URL || 'http://localhost:5001'
+    whisperApiUrl
   });
 };

@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@huggingface/transformers": "^3.8.1",
     "@langchain/baidu-qianfan": "^1.0.0",
     "@langchain/community": "^1.0.4",

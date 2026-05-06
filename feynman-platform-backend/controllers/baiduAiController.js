@@ -9,52 +9,124 @@
 
 const fs = require('fs');
 const path = require('path');
-const ffmpeg = require('fluent-ffmpeg');
+const { execFile, spawnSync, spawn } = require('child_process');
 
-// 尝试确定 ffmpeg 可执行文件路径：优先仓库内 > ffmpeg-static > 环境变量
+// 尝试确定 ffmpeg 可执行文件路径：优先工作区内捆绑二进制 > 环境变量 > ffmpeg-static > PATH
 let ffmpegPath;
 
-// 1) 仓库内捆绑二进制（Windows/Unix 兼容）
-const bundledPath = path.join(
-  __dirname,
-  '..',
-  'ffmpeg-8.0-essentials_build',
-  'ffmpeg-8.0-essentials_build',
-  'bin',
-  process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg'
-);
-if (fs.existsSync(bundledPath)) {
-  ffmpegPath = bundledPath;
+function canRunFfmpeg(candidate) {
+  try {
+    const result = spawnSync(candidate, ['-version'], { windowsHide: true, encoding: 'utf8' });
+    return result.status === 0;
+  } catch (error) {
+    return false;
+  }
 }
 
-// 2) ffmpeg-static 包
+const bundledCandidates = [
+  // 1) 工作区根目录下的 ffmpeg 包（当前项目结构）
+  path.join(
+    __dirname,
+    '..',
+    '..',
+    'ffmpeg-8.0-essentials_build',
+    'ffmpeg-8.0-essentials_build',
+    'bin',
+    process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg'
+  ),
+  // 2) 后端目录下的 ffmpeg 包（兼容旧结构）
+  path.join(
+    __dirname,
+    '..',
+    'ffmpeg-8.0-essentials_build',
+    'ffmpeg-8.0-essentials_build',
+    'bin',
+    process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg'
+  ),
+];
+
+for (const candidate of bundledCandidates) {
+  if (fs.existsSync(candidate) && canRunFfmpeg(candidate)) {
+    ffmpegPath = candidate;
+    break;
+  }
+}
+
+if (!ffmpegPath && process.env.FFMPEG_PATH && canRunFfmpeg(process.env.FFMPEG_PATH)) {
+  ffmpegPath = process.env.FFMPEG_PATH;
+}
+
 if (!ffmpegPath) {
   try {
-    ffmpegPath = require('ffmpeg-static');
-    if (!ffmpegPath || !fs.existsSync(ffmpegPath)) {
-      ffmpegPath = undefined;
+    const installerPath = require('@ffmpeg-installer/ffmpeg').path;
+    if (installerPath && fs.existsSync(installerPath) && canRunFfmpeg(installerPath)) {
+      ffmpegPath = installerPath;
     }
-  } catch (e) {
+  } catch (error) {
     ffmpegPath = undefined;
   }
 }
 
-// 3) 环境变量 FFMPEG_PATH
-if (!ffmpegPath && process.env.FFMPEG_PATH && fs.existsSync(process.env.FFMPEG_PATH)) {
-  ffmpegPath = process.env.FFMPEG_PATH;
+if (!ffmpegPath) {
+  try {
+    const staticPath = require('ffmpeg-static');
+    if (staticPath && fs.existsSync(staticPath) && canRunFfmpeg(staticPath)) {
+      ffmpegPath = staticPath;
+    }
+  } catch (error) {
+    ffmpegPath = undefined;
+  }
 }
 
-// 4) 设置 ffmpeg 路径（若找到）
+if (!ffmpegPath && canRunFfmpeg('ffmpeg')) {
+  ffmpegPath = 'ffmpeg';
+}
+
 if (ffmpegPath) {
-  try {
-    ffmpeg.setFfmpegPath(ffmpegPath);
-    console.log('✅ 使用 ffmpeg 可执行文件:', ffmpegPath);
-    console.log('✅ FFmpeg 路径是否存在:', fs.existsSync(ffmpegPath));
-  } catch (e) {
-    console.warn('⚠️ 设置 ffmpeg 路径时出错:', e.message);
-  }
+  console.log('✅ 使用 ffmpeg 可执行文件:', ffmpegPath);
 } else {
-  console.warn('⚠️ 未找到 ffmpeg 可执行文件。请安装 ffmpeg、将其加入 PATH，或设置环境变量 FFMPEG_PATH 指向可执行文件。');
+  console.warn('⚠️ 未找到可执行的 ffmpeg。请安装 ffmpeg，或设置环境变量 FFMPEG_PATH 指向有效 ffmpeg.exe。');
+}
+
+function resampleTo16kMono(inputPath, outputPath) {
+  return new Promise((resolve, reject) => {
+    const ffmpegBin = ffmpegPath || process.env.FFMPEG_PATH || 'ffmpeg';
+    const args = ['-y', '-i', inputPath, '-ac', '1', '-ar', '16000', outputPath];
+
+    console.log(`🔧 执行 ffmpeg: ${ffmpegBin}`);
+    console.log(`📋 参数: ${args.join(' ')}`);
+
+    // 使用 spawn 替代 execFile，添加 shell: true 以兼容 Git Bash 环境
+    const ffmpegProcess = spawn(ffmpegBin, args, {
+      shell: true,
+      windowsHide: true
+    });
+
+    let stderr = '';
+    let stdout = '';
+
+    ffmpegProcess.stdout.on('data', (data) => {
+      stdout += data.toString();
+    });
+
+    ffmpegProcess.stderr.on('data', (data) => {
+      stderr += data.toString();
+    });
+
+    ffmpegProcess.on('error', (error) => {
+      const hint = '请检查 ffmpeg 是否可执行（路径/权限），或设置环境变量 FFMPEG_PATH 指向 ffmpeg.exe。';
+      return reject(new Error(`ffmpeg spawn error: ${error.message}. ${hint}`));
+    });
+
+    ffmpegProcess.on('close', (code) => {
+      if (code !== 0) {
+        const hint = '请检查 ffmpeg 是否可执行（路径/权限），或设置环境变量 FFMPEG_PATH 指向 ffmpeg.exe。';
+        const details = stderr || stdout || `Exit code: ${code}`;
+        return reject(new Error(`ffmpeg execution failed: ${details}. ${hint}`));
+      }
+      resolve();
+    });
+  });
 }
 
 const { v4: uuidv4 } = require('uuid');
@@ -73,9 +145,6 @@ const { HumanMessage } = require("@langchain/core/messages");
 // 从 vectorStoreService 导入修复后的 embeddings 和路径
 // 注意：vectorStoreService 中已经修复了 CJS/ESM 双实例问题，确保镜像生效
 const { embeddings, VECTOR_STORE_PATH } = require('../services/vectorStoreService');
-
-// 显式设置 ffmpeg 路径（若上面已解析到）
-ffmpeg.setFfmpegPath(ffmpegPath);
 
 /**
  * 带重试和相似度过滤的 RAG 检索
@@ -363,25 +432,25 @@ exports.evaluateFeynmanAttempt = async (req, res) => {
       });
     }
 
-    // 5. 获取API Key (千幆v2使用QIANFAN_ACCESS_KEY)
-    const apiKey = process.env.QIANFAN_ACCESS_KEY;
+    // 5. 获取API Key (使用 DeepSeek)
+    const apiKey = process.env.DEEPSEEK_API_KEY;
     if (!apiKey) {
-      throw new Error('缺少QIANFAN_ACCESS_KEY配置');
+      throw new Error('缺少DEEPSEEK_API_KEY配置');
     }
 
-    // 6. 构建API URL (千幆v2 API)
-    const apiUrl = 'https://qianfan.baidubce.com/v2/chat/completions';
+    // 6. 构建API URL (DeepSeek API)
+    const apiUrl = 'https://api.deepseek.com/chat/completions';
 
-    // 7. 设计Prompt（同时要求“先润色后评价”）
+    // 7. 设计Prompt（同时要求”先润色后评价”）
     const prompt = buildEvaluationPrompt(originalContent, transcribedText);
 
-    // 8. 调用大模型API (千帆v2格式)
-    console.log('📤 调用千帆v2 API (ernie-4.0-8k)...');
+    // 8. 调用大模型API (DeepSeek)
+    console.log('📤 调用 DeepSeek API (deepseek-chat)...');
     console.log('📝 原始内容长度:', originalContent.length, '字符');
     console.log('📝 复述文本长度:', transcribedText.length, '字符');
 
     const response = await axios.post(apiUrl, {
-      model: 'ernie-4.0-8k',  // 使用ERNIE 4.0模型
+      model: 'deepseek-chat',
       messages: [
         {
           role: 'user',
@@ -389,30 +458,15 @@ exports.evaluateFeynmanAttempt = async (req, res) => {
         }
       ],
       temperature: 0.3,  // 降低随机性，提升评分一致性
-      top_p: 0.9,
-      web_search: {
-        enable: false
-      }
     }, {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       },
-      timeout: 30000  // ernie-speed-8k响应快，30秒足够
+      timeout: 30000
     });
 
-    // 如果百度返回错误码，直接透传错误
-    if (response.data && (response.data.error_code || response.data.error_msg)) {
-      console.error('❌ 百度API错误:', response.data);
-      const status = response.status || 502;
-      return res.status(status === 200 ? 502 : status).json({
-        msg: 'Baidu API error',
-        error_code: response.data.error_code,
-        error_msg: response.data.error_msg
-      });
-    }
-
-    // 9. 解析响应 (千幆v2格式: choices[0].message.content)
+    // 9. 解析响应 (DeepSeek 格式: choices[0].message.content)
     const llmResultText = response.data.choices?.[0]?.message?.content;
     console.log('📝 大模型原始返回:', llmResultText);
 
@@ -545,20 +599,7 @@ exports.transcribeAudio = async (req, res) => {
     // 2️⃣ 使用 ffmpeg 重采样为 16kHz、单声道
     console.log('⚙️ 正在重采样为 16kHz 单声道...');
 
-    await new Promise((resolve, reject) => {
-      ffmpeg(inputPath)
-        .audioFrequency(16000)
-        .audioChannels(1)
-        .toFormat('wav')
-        .on('end', resolve)
-        .on('error', (err) => {
-          console.error('❌ ffmpeg 执行错误:', err && err.message ? err.message : err);
-          // 给出常见排错建议
-          const hint = '请检查 ffmpeg 是否可执行（路径/权限），或是否被杀毒软件阻止；可通过设置环境变量 FFMPEG_PATH 或将 ffmpeg 加入 PATH 来解决。';
-          reject(new Error(`ffmpeg execution failed: ${err && err.message ? err.message : String(err)}. ${hint}`));
-        })
-        .save(outputPath);
-    });
+    await resampleTo16kMono(inputPath, outputPath);
     console.log('✅ 重采样完成');
 
     // 3️⃣ 读取转换后的音频 Buffer
@@ -727,24 +768,23 @@ exports.generateQuestion = async (req, res) => {
     console.log(`📝 输入内容长度: ${knowledgePointContent.length} 字符`);
 
     // 3. 获取API Token
-    const apiKey = process.env.QIANFAN_ACCESS_KEY;
+    const apiKey = process.env.DEEPSEEK_API_KEY;
     if (!apiKey) {
-      throw new Error('缺少QIANFAN_ACCESS_KEY配置');
+      throw new Error('缺少DEEPSEEK_API_KEY配置');
     }
 
     // 4. 构建Prompt (根据题型)
-    const prompt = type === 'single-choice' 
+    const prompt = type === 'single-choice'
       ? buildSingleChoicePrompt(knowledgePointContent, difficulty)
       : buildShortAnswerPrompt(knowledgePointContent, difficulty);
 
-    // 5. 调用千帆API
-    const apiUrl = 'https://qianfan.baidubce.com/v2/chat/completions';
+    // 5. 调用 DeepSeek API
+    const apiUrl = 'https://api.deepseek.com/chat/completions';
     const startTime = Date.now();
     const response = await axios.post(apiUrl, {
-      model: 'ernie-4.0-8k',
+      model: 'deepseek-chat',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
-      top_p: 0.9
     }, {
       headers: {
         'Content-Type': 'application/json',
@@ -897,9 +937,9 @@ exports.explainChoice = async (req, res) => {
     }
 
     // 2. 获取API Token
-    const apiKey = process.env.QIANFAN_ACCESS_KEY;
+    const apiKey = process.env.DEEPSEEK_API_KEY;
     if (!apiKey) {
-      throw new Error('缺少QIANFAN_ACCESS_KEY配置');
+      throw new Error('缺少DEEPSEEK_API_KEY配置');
     }
 
     // 3. 构建Prompt
@@ -941,14 +981,13 @@ ${originalExplanation ? `\n【出题时的解析】:\n${originalExplanation}` : 
    - 可以扩展相关知识点
    - 帮助学生建立知识体系`;
 
-    // 4. 调用千帆API
-    const apiUrl = 'https://qianfan.baidubce.com/v2/chat/completions';
+    // 4. 调用 DeepSeek API
+    const apiUrl = 'https://api.deepseek.com/chat/completions';
     const startTime = Date.now();
     const response = await axios.post(apiUrl, {
-      model: 'ernie-4.0-8k',
+      model: 'deepseek-chat',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.3,
-      top_p: 0.8
     }, {
       headers: {
         'Content-Type': 'application/json',
