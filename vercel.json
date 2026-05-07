@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "feynman-platform-frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "feynman-platform-frontend/dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "feynman-platform-frontend/$1"
+    }
+  ]
+}
