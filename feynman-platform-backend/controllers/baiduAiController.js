@@ -1531,3 +1531,135 @@ exports.answerWithRAGStream = async (req, res) => {
     res.end();
   }
 };
+
+/**
+ * 多阶段评估费曼复述
+ * @route POST /api/ai/evaluate-staged
+ * @access Private
+ * @param {Object} req.body
+ *   - originalContent: string (必填, 原始知识点内容)
+ *   - transcribedText: string (必填, 用户复述的转写文本)
+ *   - knowledgePointId: string (可选, 知识点ID)
+ * @returns {Object} { stage1, stage2, stage3, finalScore }
+ */
+exports.evaluateStaged = async (req, res) => {
+  let { originalContent, transcribedText, knowledgePointId } = req.body || {};
+
+  if (!transcribedText?.trim()) {
+    return res.status(400).json({ msg: 'transcribedText is required' });
+  }
+
+  // 如果提供了 knowledgePointId，从数据库获取原文
+  if (knowledgePointId) {
+    try {
+      const kp = await KnowledgePoint.findById(knowledgePointId);
+      if (!kp) return res.status(404).json({ msg: 'Knowledge point not found' });
+      if (kp.author.toString() !== req.user.id) {
+        return res.status(403).json({ msg: 'Not authorized' });
+      }
+      originalContent = kp.content || '';
+    } catch (e) {
+      return res.status(400).json({ msg: 'Invalid knowledgePointId' });
+    }
+  }
+
+  if (!originalContent?.trim()) {
+    return res.status(400).json({ msg: 'originalContent is required' });
+  }
+
+  try {
+    const apiKey = process.env.DEEPSEEK_API_KEY;
+    if (!apiKey) throw new Error('缺少DEEPSEEK_API_KEY配置');
+
+    const apiUrl = 'https://api.deepseek.com/chat/completions';
+    const callDeepSeek = async (prompt) => {
+      const response = await axios.post(apiUrl, {
+        model: 'deepseek-chat',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.3
+      }, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+        timeout: 30000
+      });
+      const text = response.data.choices?.[0]?.message?.content;
+      try {
+        return JSON.parse(text);
+      } catch {
+        const match = text.match(/```(?:json)?\s*([\s\S]*?)```/) ||
+                      [null, text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1)];
+        return JSON.parse(match[1].trim());
+      }
+    };
+
+    // 阶段1：概念提取
+    console.log('🔍 阶段1：概念提取...');
+    const stage1Prompt = `原始知识点：
+${originalContent}
+
+用户复述：
+${transcribedText}
+
+请提取用户复述中提到的核心概念，并识别遗漏的概念。返回JSON：
+{
+  "coveredConcepts": ["概念1", "概念2"],
+  "missedConcepts": ["遗漏概念1", "遗漏概念2"]
+}`;
+    const stage1 = await callDeepSeek(stage1Prompt);
+
+    // 阶段2：逻辑结构评分
+    console.log('🧩 阶段2：逻辑结构评分...');
+    const stage2Prompt = `用户复述：
+${transcribedText}
+
+已识别概念：${stage1.coveredConcepts.join('、')}
+
+评估复述的逻辑结构（概念间关系、因果链、层次性）。返回JSON：
+{
+  "logicScore": 75,
+  "logicIssues": ["问题1", "问题2"]
+}`;
+    const stage2 = await callDeepSeek(stage2Prompt);
+
+    // 阶段3：误区诊断
+    console.log('⚠️ 阶段3：误区诊断...');
+    const stage3Prompt = `原始知识点：
+${originalContent}
+
+用户复述：
+${transcribedText}
+
+识别用户理解中的误区或错误表述。返回JSON：
+{
+  "misconceptions": [
+    {"point": "误区描述", "correction": "正确理解"}
+  ],
+  "strengths": ["优点1", "优点2"],
+  "suggestions": ["建议1", "建议2"]
+}`;
+    const stage3 = await callDeepSeek(stage3Prompt);
+
+    // 综合评分
+    const coverageScore = (stage1.coveredConcepts.length /
+      (stage1.coveredConcepts.length + stage1.missedConcepts.length)) * 100;
+    const finalScore = Math.round(coverageScore * 0.4 + stage2.logicScore * 0.4 +
+      (stage3.misconceptions.length === 0 ? 100 : 60) * 0.2);
+
+    console.log(`✅ 三阶段评估完成，最终得分: ${finalScore}`);
+
+    res.json({
+      stage1: { ...stage1, name: '概念提取' },
+      stage2: { ...stage2, name: '逻辑结构' },
+      stage3: { ...stage3, name: '误区诊断' },
+      finalScore,
+      breakdown: {
+        coverage: Math.round(coverageScore),
+        logic: stage2.logicScore,
+        accuracy: stage3.misconceptions.length === 0 ? 100 : 60
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ 多阶段评估失败:', error.message);
+    res.status(500).json({ msg: 'Staged evaluation failed', error: error.message });
+  }
+};
