@@ -1,5 +1,8 @@
-# 使用官方的 Node.js 18 镜像作为基础
-FROM node:18-alpine
+# 使用官方的 Node.js 20 镜像作为基础
+FROM node:20-alpine
+
+# 安装 node-gyp 编译所需的构建工具 (hnswlib-node 需要)
+RUN apk add --no-cache python3 make g++
 
 # 设置工作目录
 WORKDIR /app
