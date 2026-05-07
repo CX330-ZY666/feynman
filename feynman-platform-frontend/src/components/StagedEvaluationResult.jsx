@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './StagedEvaluationResult.css';
 
-function StagedEvaluationResult({ result }) {
+function StagedEvaluationResult({ result, followUpQuestions }) {
   const [activeStage, setActiveStage] = useState(1);
 
   if (!result) return null;
@@ -115,6 +115,24 @@ function StagedEvaluationResult({ result }) {
           <span>准确性 {breakdown.accuracy}%</span>
         </div>
       </div>
+
+      {followUpQuestions && followUpQuestions.questions && (
+        <div className="follow-up-section">
+          <h3>🤔 深度追问</h3>
+          <p className="follow-up-hint">针对您的薄弱环节，AI教练为您准备了以下问题：</p>
+          <div className="follow-up-questions">
+            {followUpQuestions.questions.map((q, i) => (
+              <div key={i} className="follow-up-card">
+                <div className="question-number">Q{i + 1}</div>
+                <div className="question-content">
+                  <div className="question-text">{q.question}</div>
+                  <div className="question-focus">聚焦：{q.focus}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
