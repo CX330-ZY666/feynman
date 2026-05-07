@@ -1741,9 +1741,11 @@ exports.compareAttempts = async (req, res) => {
   try {
     const { knowledgePointId } = req.body;
 
-    const attempts = await FeynmanAttempt.find({ knowledgePointId })
+    const attempts = await FeynmanAttempt.find({ knowledgePoint: knowledgePointId })
       .sort({ createdAt: -1 })
       .limit(5);
+
+    console.log(`[compareAttempts] 找到 ${attempts.length} 条历史记录`);
 
     if (attempts.length < 2) {
       return res.json({ hasHistory: false, msg: '历史记录不足，需要至少2次复述' });

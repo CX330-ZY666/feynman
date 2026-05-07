@@ -26,6 +26,8 @@ function FeynmanRecordPage() {
   const [followUpQuestions, setFollowUpQuestions] = useState(null); // 追问
   const [isLoadingFollowUp, setIsLoadingFollowUp] = useState(false); // 追问加载状态
   const [comparison, setComparison] = useState(null); // 历史对比
+  const [historyAttempts, setHistoryAttempts] = useState([]); // 历史记录
+  const [showHistory, setShowHistory] = useState(false); // 是否显示历史
 
   // 分开保存的选项与状态
   const [isSavingAttempt, setIsSavingAttempt] = useState(false);
@@ -43,6 +45,17 @@ function FeynmanRecordPage() {
       }
     };
     fetchKpTitle();
+
+    // 加载历史记录
+    const fetchHistory = async () => {
+      try {
+        const res = await apiClient.get(`/attempts/${id}`);
+        setHistoryAttempts(res.data || []);
+      } catch (err) {
+        console.warn('加载历史记录失败:', err);
+      }
+    };
+    fetchHistory();
   }, [id]);
 
   // 三阶段评估
@@ -123,6 +136,26 @@ function FeynmanRecordPage() {
       const createdId = resp.data?.id || resp.data?._id;
       setAttemptId(createdId || null);
       setSaveAttemptMsg('✅ 已保存本次复述/评价结果');
+
+      // 保存成功后重新加载历史记录和对比
+      try {
+        const historyRes = await apiClient.get(`/attempts/${id}`);
+        setHistoryAttempts(historyRes.data || []);
+        console.log('历史记录数量:', historyRes.data?.length);
+
+        const compareRes = await apiClient.post('/ai/compare-attempts', {
+          knowledgePointId: id
+        });
+        console.log('对比结果:', compareRes.data);
+        if (compareRes.data.hasHistory) {
+          setComparison(compareRes.data);
+          console.log('✅ 已设置对比数据');
+        } else {
+          console.log('⚠️ 历史记录不足，需要至少2次复述');
+        }
+      } catch (err) {
+        console.error('重新加载历史对比失败:', err);
+      }
     } catch (e) {
       setSaveAttemptMsg(`❌ 保存失败：${e?.response?.data?.msg || e?.message || '未知错误'}`);
     } finally {
@@ -136,9 +169,39 @@ function FeynmanRecordPage() {
       <div className="feynman-header">
         <Link to="/" className="back-link">← 返回列表</Link>
         <h1>🎤 复述知识点: <span className="kp-title">{kpTitle}</span></h1>
+        {historyAttempts.length > 0 && (
+          <button
+            onClick={() => setShowHistory(!showHistory)}
+            className="btn-history"
+          >
+            📜 {showHistory ? '隐藏' : '查看'}历史记录 ({historyAttempts.length})
+          </button>
+        )}
       </div>
 
       {!!loadError && <div className="feynman-error">❌ {loadError}</div>}
+
+      {/* 历史记录展示 */}
+      {showHistory && historyAttempts.length > 0 && (
+        <div className="history-section">
+          <h3>📚 历史复述记录</h3>
+          <div className="history-list">
+            {historyAttempts.map((attempt, index) => (
+              <div key={attempt._id || index} className="history-item">
+                <div className="history-header">
+                  <span className="history-date">
+                    {new Date(attempt.createdAt).toLocaleString('zh-CN')}
+                  </span>
+                  <span className={`history-score ${attempt.score >= 80 ? 'high' : attempt.score >= 60 ? 'medium' : 'low'}`}>
+                    得分: {attempt.score}
+                  </span>
+                </div>
+                <div className="history-feedback">{attempt.feedback}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* 录音区域 */}
       <div className="recorder-card">
