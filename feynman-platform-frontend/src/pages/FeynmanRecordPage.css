@@ -357,6 +357,41 @@
   padding-left: 1.5rem;
 }
 
+/* 评估模式切换 */
+.eval-mode-toggle {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.eval-mode-toggle label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 8px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.eval-mode-toggle label:hover {
+  border-color: #667eea;
+  background: #f8f9ff;
+}
+
+.eval-mode-toggle input[type="radio"]:checked + label,
+.eval-mode-toggle label:has(input[type="radio"]:checked) {
+  border-color: #667eea;
+  background: #667eea;
+  color: white;
+}
+
+.eval-mode-toggle input[type="radio"] {
+  margin: 0;
+}
+
+
 .feedback-card li {
   margin-bottom: 0.5rem;
 }
