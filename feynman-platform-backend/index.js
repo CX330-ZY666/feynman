@@ -63,7 +63,7 @@ const isVercelOrigin = (origin) => {
 const isTrustedFeynmanFrontendOrigin = (origin) => {
   try {
     const hostname = new URL(origin).hostname;
-    return hostname.endsWith('.vercel.app') && hostname.startsWith('feynman-platform-frontend');
+    return hostname.endsWith('.vercel.app') && hostname.includes('feynman');
   } catch (error) {
     return false;
   }
