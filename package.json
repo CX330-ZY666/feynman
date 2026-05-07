@@ -1,6 +1,8 @@
 {
-  "dependencies": {
-    "d3-force-3d": "^3.0.6",
-    "three": "^0.181.2"
+  "name": "feynman-platform",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "cd feynman-platform-backend && npm start",
+    "build": "cd feynman-platform-backend && npm install"
   }
 }
