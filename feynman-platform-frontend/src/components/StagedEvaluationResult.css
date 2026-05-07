@@ -296,3 +296,96 @@
   color: #0ea5e9;
   font-weight: 500;
 }
+
+.comparison-section {
+  margin-top: 30px;
+  padding: 20px;
+  background: #fef3c7;
+  border-radius: 12px;
+  border: 2px solid #fbbf24;
+}
+
+.comparison-section h3 {
+  margin: 0 0 15px 0;
+  color: #92400e;
+  font-size: 18px;
+}
+
+.score-change {
+  text-align: center;
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.change-label {
+  font-size: 14px;
+  color: #666;
+  margin-right: 10px;
+}
+
+.change-value {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.change-value.positive {
+  color: #10b981;
+}
+
+.change-value.negative {
+  color: #ef4444;
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.comparison-card {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.comparison-card h4 {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+}
+
+.comparison-card.improvements h4 {
+  color: #10b981;
+}
+
+.comparison-card.regressions h4 {
+  color: #f59e0b;
+}
+
+.comparison-card ul {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.comparison-suggestions {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.comparison-suggestions h4 {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  color: #0ea5e9;
+}
+
+.comparison-suggestions ul {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 13px;
+  line-height: 1.6;
+}

@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
-const { generateQuestion, gradeAnswer, explainChoice, answerWithRAG, answerWithRAGStream, evaluateStaged, generateFollowUpQuestions } = require('../controllers/baiduAiController');
+const { generateQuestion, gradeAnswer, explainChoice, answerWithRAG, answerWithRAGStream, evaluateStaged, generateFollowUpQuestions, compareAttempts } = require('../controllers/baiduAiController');
 const KnowledgePoint = require('../models/KnowledgePoint');
 const { addKnowledgePointToStore } = require('../services/vectorStoreService');
 
@@ -40,6 +40,11 @@ router.post('/evaluate-staged', auth, evaluateStaged);
 // @desc    生成费曼追问
 // @access  Private
 router.post('/follow-up-questions', auth, generateFollowUpQuestions);
+
+// @route   POST /api/ai/compare-attempts
+// @desc    历史对比分析
+// @access  Private
+router.post('/compare-attempts', auth, compareAttempts);
 
 // @route   POST /api/ai/rebuild-vector-store
 // @desc    重建向量库（将数据库中所有知识点重新索引）

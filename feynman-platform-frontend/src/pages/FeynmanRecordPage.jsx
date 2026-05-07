@@ -25,6 +25,7 @@ function FeynmanRecordPage() {
   const [stagedResult, setStagedResult] = useState(null); // 三阶段评估结果
   const [followUpQuestions, setFollowUpQuestions] = useState(null); // 追问
   const [isLoadingFollowUp, setIsLoadingFollowUp] = useState(false); // 追问加载状态
+  const [comparison, setComparison] = useState(null); // 历史对比
 
   // 分开保存的选项与状态
   const [isSavingAttempt, setIsSavingAttempt] = useState(false);
@@ -78,6 +79,18 @@ function FeynmanRecordPage() {
         console.error('生成追问失败:', err);
       } finally {
         setIsLoadingFollowUp(false);
+      }
+
+      // 获取历史对比
+      try {
+        const compareRes = await apiClient.post('/ai/compare-attempts', {
+          knowledgePointId: id
+        });
+        if (compareRes.data.hasHistory) {
+          setComparison(compareRes.data);
+        }
+      } catch (err) {
+        console.warn('历史对比失败:', err);
       }
     } catch (error) {
       console.error('三阶段评估失败:', error);
@@ -185,7 +198,7 @@ function FeynmanRecordPage() {
                 </span>
               )}
             </div>
-            <StagedEvaluationResult result={stagedResult} followUpQuestions={followUpQuestions} />
+            <StagedEvaluationResult result={stagedResult} followUpQuestions={followUpQuestions} comparison={comparison} />
             {isLoadingFollowUp && (
               <div className="follow-up-loading">
                 <p>🤔 AI教练正在准备深度追问...</p>
