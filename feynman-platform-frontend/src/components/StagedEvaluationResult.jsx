@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './StagedEvaluationResult.css';
 
-function StagedEvaluationResult({ result, followUpQuestions }) {
+function StagedEvaluationResult({ result, followUpQuestions, comparison }) {
   const [activeStage, setActiveStage] = useState(1);
 
   if (!result) return null;
@@ -131,6 +131,44 @@ function StagedEvaluationResult({ result, followUpQuestions }) {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {comparison && comparison.hasHistory && (
+        <div className="comparison-section">
+          <h3>📈 学习进步分析</h3>
+          <div className="score-change">
+            <span className="change-label">得分变化：</span>
+            <span className={`change-value ${comparison.scoreChange >= 0 ? 'positive' : 'negative'}`}>
+              {comparison.scoreChange >= 0 ? '+' : ''}{comparison.scoreChange}
+            </span>
+          </div>
+          <div className="comparison-grid">
+            {comparison.improvements.length > 0 && (
+              <div className="comparison-card improvements">
+                <h4>✅ 进步之处</h4>
+                <ul>
+                  {comparison.improvements.map((item, i) => <li key={i}>{item}</li>)}
+                </ul>
+              </div>
+            )}
+            {comparison.regressions.length > 0 && (
+              <div className="comparison-card regressions">
+                <h4>⚠️ 需要注意</h4>
+                <ul>
+                  {comparison.regressions.map((item, i) => <li key={i}>{item}</li>)}
+                </ul>
+              </div>
+            )}
+          </div>
+          {comparison.suggestions.length > 0 && (
+            <div className="comparison-suggestions">
+              <h4>💡 改进建议</h4>
+              <ul>
+                {comparison.suggestions.map((item, i) => <li key={i}>{item}</li>)}
+              </ul>
+            </div>
+          )}
         </div>
       )}
     </div>

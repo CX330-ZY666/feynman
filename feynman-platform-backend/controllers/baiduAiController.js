@@ -1735,3 +1735,45 @@ ${originalContent}
     res.status(500).json({ msg: 'Failed to generate follow-up questions', error: error.message });
   }
 };
+
+// 历史对比分析
+exports.compareAttempts = async (req, res) => {
+  try {
+    const { knowledgePointId } = req.body;
+
+    const attempts = await FeynmanAttempt.find({ knowledgePointId })
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    if (attempts.length < 2) {
+      return res.json({ hasHistory: false, msg: '历史记录不足，需要至少2次复述' });
+    }
+
+    const latest = attempts[0];
+    const previous = attempts[1];
+
+    const prompt = `对比用户两次费曼复述，分析进步情况：
+
+第一次复述（${new Date(previous.createdAt).toLocaleDateString()}）：
+- 得分：${previous.score}
+- 反馈：${previous.feedback}
+
+最新复述（${new Date(latest.createdAt).toLocaleDateString()}）：
+- 得分：${latest.score}
+- 反馈：${latest.feedback}
+
+分析进步与退步。返回JSON：
+{
+  "scoreChange": ${latest.score - previous.score},
+  "improvements": ["进步1", "进步2"],
+  "regressions": ["退步1"],
+  "suggestions": ["建议1", "建议2"]
+}`;
+
+    const result = await callDeepSeek(prompt);
+    res.json({ hasHistory: true, ...result, attempts: attempts.slice(0, 3) });
+  } catch (error) {
+    console.error('❌ 历史对比失败:', error);
+    res.status(500).json({ msg: 'Failed to compare attempts', error: error.message });
+  }
+};
