@@ -99,8 +99,8 @@ const corsOptions = {
       return callback(null, true);
     }
 
-    // 可选：允许 Vercel 预览环境域名（如 PR 部署）
-    if (allowVercelPreview && isVercelOrigin(origin)) {
+    // 允许所有 Vercel 域名（包括预览环境）
+    if (isVercelOrigin(origin)) {
       return callback(null, true);
     }
 
