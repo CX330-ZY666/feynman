@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
-const { generateQuestion, gradeAnswer, explainChoice, answerWithRAG, answerWithRAGStream, evaluateStaged } = require('../controllers/baiduAiController');
+const { generateQuestion, gradeAnswer, explainChoice, answerWithRAG, answerWithRAGStream, evaluateStaged, generateFollowUpQuestions } = require('../controllers/baiduAiController');
 const KnowledgePoint = require('../models/KnowledgePoint');
 const { addKnowledgePointToStore } = require('../services/vectorStoreService');
 
@@ -35,6 +35,11 @@ router.post('/rag-qa-stream', auth, answerWithRAGStream);
 // @desc    多阶段评估费曼复述
 // @access  Private
 router.post('/evaluate-staged', auth, evaluateStaged);
+
+// @route   POST /api/ai/follow-up-questions
+// @desc    生成费曼追问
+// @access  Private
+router.post('/follow-up-questions', auth, generateFollowUpQuestions);
 
 // @route   POST /api/ai/rebuild-vector-store
 // @desc    重建向量库（将数据库中所有知识点重新索引）

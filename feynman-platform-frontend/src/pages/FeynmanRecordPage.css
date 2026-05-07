@@ -395,3 +395,13 @@
 .feedback-card li {
   margin-bottom: 0.5rem;
 }
+
+.follow-up-loading {
+  text-align: center;
+  padding: 1.5rem;
+  background: #f0f9ff;
+  border-radius: 12px;
+  margin-top: 1rem;
+  color: #0369a1;
+  font-size: 0.95rem;
+}

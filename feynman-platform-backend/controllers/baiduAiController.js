@@ -146,6 +146,31 @@ const { HumanMessage } = require("@langchain/core/messages");
 // 注意：vectorStoreService 中已经修复了 CJS/ESM 双实例问题，确保镜像生效
 const { embeddings, VECTOR_STORE_PATH } = require('../services/vectorStoreService');
 
+// DeepSeek API 辅助函数
+async function callDeepSeek(prompt) {
+  const apiKey = process.env.DEEPSEEK_API_KEY;
+  if (!apiKey) throw new Error('缺少DEEPSEEK_API_KEY配置');
+
+  const apiUrl = 'https://api.deepseek.com/chat/completions';
+  const response = await axios.post(apiUrl, {
+    model: 'deepseek-chat',
+    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.3
+  }, {
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+    timeout: 30000
+  });
+
+  const text = response.data.choices?.[0]?.message?.content;
+  try {
+    return JSON.parse(text);
+  } catch {
+    const match = text.match(/```(?:json)?\s*([\s\S]*?)```/) ||
+                  [null, text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1)];
+    return JSON.parse(match[1].trim());
+  }
+}
+
 /**
  * 带重试和相似度过滤的 RAG 检索
  * - 遇到 QPS/RPM 限流时指数退避重试
@@ -1661,5 +1686,52 @@ ${transcribedText}
   } catch (error) {
     console.error('❌ 多阶段评估失败:', error.message);
     res.status(500).json({ msg: 'Staged evaluation failed', error: error.message });
+  }
+};
+
+// 生成费曼追问
+exports.generateFollowUpQuestions = async (req, res) => {
+  try {
+    console.log('📝 收到追问请求，body:', JSON.stringify(req.body, null, 2));
+    const { evaluationResult, originalContent } = req.body;
+
+    if (!evaluationResult || !originalContent) {
+      return res.status(400).json({ msg: '缺少必要参数' });
+    }
+
+    const missedConcepts = evaluationResult.stage1?.missedConcepts?.length > 0
+      ? evaluationResult.stage1.missedConcepts.join('、') : '无';
+    const logicIssues = evaluationResult.stage2?.logicIssues?.length > 0
+      ? evaluationResult.stage2.logicIssues.join('、') : '无';
+    const misconceptions = evaluationResult.stage3?.misconceptions?.length > 0
+      ? evaluationResult.stage3.misconceptions.map(m => m.point).join('、') : '无';
+
+    const prompt = `基于以下评估结果，生成3个深度追问，帮助用户加深理解：
+
+原始知识点：
+${originalContent}
+
+评估结果：
+- 遗漏概念：${missedConcepts}
+- 逻辑问题：${logicIssues}
+- 误区：${misconceptions}
+
+生成3个追问，针对薄弱环节。返回JSON：
+{
+  "questions": [
+    {"question": "问题1", "focus": "遗漏概念"},
+    {"question": "问题2", "focus": "逻辑结构"},
+    {"question": "问题3", "focus": "深度理解"}
+  ]
+}`;
+
+    console.log('🤖 调用DeepSeek生成追问...');
+    const result = await callDeepSeek(prompt);
+    console.log('✅ 追问生成成功:', result);
+    res.json(result);
+  } catch (error) {
+    console.error('❌ 生成追问失败:', error);
+    console.error('错误堆栈:', error.stack);
+    res.status(500).json({ msg: 'Failed to generate follow-up questions', error: error.message });
   }
 };

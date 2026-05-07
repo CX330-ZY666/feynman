@@ -23,6 +23,8 @@ function FeynmanRecordPage() {
   const [evaluationError, setEvaluationError] = useState('');
   const [originalContent, setOriginalContent] = useState(''); // 保存原始知识点内容
   const [stagedResult, setStagedResult] = useState(null); // 三阶段评估结果
+  const [followUpQuestions, setFollowUpQuestions] = useState(null); // 追问
+  const [isLoadingFollowUp, setIsLoadingFollowUp] = useState(false); // 追问加载状态
 
   // 分开保存的选项与状态
   const [isSavingAttempt, setIsSavingAttempt] = useState(false);
@@ -61,6 +63,21 @@ function FeynmanRecordPage() {
         await apiClient.put(`/knowledge-points/${id}/review`, { reviewList: true });
       } else {
         await apiClient.put(`/knowledge-points/${id}/review`, { reviewList: false });
+      }
+
+      // 自动生成追问
+      setIsLoadingFollowUp(true);
+      try {
+        const followUpRes = await apiClient.post('/ai/follow-up-questions', {
+          evaluationResult: response.data,
+          originalContent
+        });
+        console.log('追问结果:', followUpRes.data);
+        setFollowUpQuestions(followUpRes.data);
+      } catch (err) {
+        console.error('生成追问失败:', err);
+      } finally {
+        setIsLoadingFollowUp(false);
       }
     } catch (error) {
       console.error('三阶段评估失败:', error);
@@ -168,7 +185,12 @@ function FeynmanRecordPage() {
                 </span>
               )}
             </div>
-            <StagedEvaluationResult result={stagedResult} />
+            <StagedEvaluationResult result={stagedResult} followUpQuestions={followUpQuestions} />
+            {isLoadingFollowUp && (
+              <div className="follow-up-loading">
+                <p>🤔 AI教练正在准备深度追问...</p>
+              </div>
+            )}
           </div>
         )}
       </div>
