@@ -141,6 +141,7 @@ public class FeynmanAiPracticeService {
     }
 
     private String shorten(String value, int maxLength) {
+        value = com.feynman.platform.common.LearningText.plain(value);
         if (value == null || value.isBlank()) return "无";
         return value.length() <= maxLength ? value : value.substring(0, maxLength);
     }

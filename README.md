@@ -1,146 +1,71 @@
-﻿# 费曼学习平台 (Feynman Learning Platform)
+# 费曼学习平台
 
-一个基于费曼学习法的全栈教育平台，核心流程是：
-录音复述 -> 语音转文字 -> AI 评价理解程度 -> 生成改进反馈。
+React + Spring Boot + MySQL 学习平台，支持知识点管理、录音复述、AI教练、费曼问答、测评、RAG助手和知识图谱。
 
-## 项目结构
+## 当前结构
 
-- `feynman-platform-backend/`：Node.js + Express 后端 API
-- `feynman-platform-frontend/`：React + Vite 前端应用（支持 Electron 桌面开发）
+- `feynman-platform-frontend/`：React + Vite，保留Electron支持。
+- `feynman-platform-springboot/`：Java 21 + Spring Boot + MyBatis Plus + MySQL，唯一正在使用的后端。
+- `deploy/`：GitHub Actions自动构建与Windows服务器部署。
+- `ffmpeg-8.0-essentials_build/`：音频工具。
 
-## 核心功能
+旧Node/MongoDB后端已在项目外备份并移除。Git历史仍保留旧代码，删除当前目录不等于清除历史。历史课程笔记不代表当前运行方式。
 
-- 用户注册/登录（JWT 鉴权）
-- 知识点管理（创建、编辑、浏览）
-- 语音输入与转写（百度 ASR + 本地 Whisper）
-- AI 评价与反馈（千帆模型）
-- 费曼练习记录管理
-- 知识图谱可视化（2D/3D）
-- RAG 私有知识库检索
+## 本地启动（Windows）
 
-## 技术栈
+准备Java 21、Node.js 22和MySQL 8，先创建数据库并配置凭据。Spring Boot不会自动读取旧后端的.env。
 
-### 前端
-- React
-- Vite
-- React Router
-- ECharts / Three.js
+一个PowerShell窗口启动后端：
 
-### 后端
-- Node.js
-- Express
-- MongoDB + Mongoose
-- LangChain
-- fluent-ffmpeg
-
-### AI / 语音
-- 百度语音识别 API
-- 百度千帆大模型
-- 本地 Whisper（Python Flask 服务）
-
-## 快速开始
-
-### 1. 克隆仓库
-
-```bash
-git clone https://github.com/CX330-ZY666/feynman.git
-cd feynman
+```powershell
+cd feynman-platform-springboot
+$env:DB_USERNAME = 'feynman_app'
+$env:DB_PASSWORD = '填写本机数据库密码'
+$env:JWT_SECRET = '填写足够长的随机密钥'
+.\mvnw.cmd spring-boot:run
 ```
 
-### 2. 安装依赖
+默认数据库名为feynman_platform，端口8080，Flyway管理表结构。已有用户应沿用原数据库和JWT配置。
 
-```bash
-# 根目录（用于图谱相关依赖）
-npm install
+另一个PowerShell窗口启动前端：
 
-# 后端
-cd feynman-platform-backend
-npm install
-
-# 前端
-cd ../feynman-platform-frontend
-npm install
-```
-
-### 3. 配置环境变量
-
-后端创建 `.env`（参考 `.env.example`），至少包含：
-
-- `MONGO_URI`
-- `JWT_SECRET`
-- `BAIDU_APP_ID`
-- `BAIDU_API_KEY`
-- `BAIDU_SECRET_KEY`
-- `QIANFAN_ACCESS_KEY`
-- `QIANFAN_SECRET_KEY`
-
-前端可配置：
-
-- `VITE_API_BASE_URL`（如 `http://localhost:3000/api`）
-
-### 4. 启动服务
-
-#### 方式 A：分别启动（推荐开发）
-
-```bash
-# 后端（端口默认 3000）
-cd feynman-platform-backend
-npm run dev
-
-# 前端（端口默认 5173）
-cd ../feynman-platform-frontend
-npm run dev
-```
-
-#### 方式 B：后端一键脚本（Windows）
-
-```bash
-cd feynman-platform-backend
-start-all.bat
-```
-
-## 目录说明
-
-### 后端目录要点
-
-- `controllers/`：业务逻辑
-- `routes/`：接口路由
-- `models/`：数据模型
-- `middleware/`：认证中间件
-- `services/`：向量检索等服务
-- `whisper-api/`：本地 Whisper Python 服务
-
-### 前端目录要点
-
-- `src/pages/`：页面
-- `src/components/`：通用组件
-- `src/context/`：全局状态（认证）
-- `src/api/`：请求封装
-
-## 常见命令
-
-```bash
-# 后端开发
-cd feynman-platform-backend
-npm run dev
-
-# 前端开发
+```powershell
 cd feynman-platform-frontend
+npm ci
+$env:VITE_API_URL = 'http://localhost:8080/api'
 npm run dev
-
-# 前端构建
-npm run build
-
-# Electron 开发
-npm run electron:dev
 ```
 
-## 注意事项
+访问Vite实际打印的地址。配置好环境后，也可双击根目录start-all.bat；脚本不会填写密码。
 
-- 不要提交任何 `.env`、密钥、Token。
-- 音频处理依赖 ffmpeg，建议在系统中可用或通过项目依赖兜底。
-- 首次启用本地 Whisper 时，请先在 `whisper-api/` 完成 Python 依赖安装。
+## 文件导入
 
-## License
+新增/编辑知识点 -> 从文件导入 -> 解析预览 -> 修正文字 -> 确认放入编辑器 -> 页面底部保存。
 
-仅用于学习与课程实践。
+- 支持DOCX、PDF、JPG/JPEG、PNG、UTF-8 TXT和Markdown。旧DOC请另存为DOCX。
+- 单文件最多10MB、100000字符；PDF最多20页。
+- DOCX提取正文和表格文字，不保留排版及内嵌图片。
+- 文字型PDF本地解析；扫描页需同意后使用百度OCR，一次最多5页扫描内容。
+- 图片可以OCR，也可仅作为压缩配图插入。当前AI检索只理解文字。
+- 原文件不长期保存。OCR会发送图片/扫描页到百度，请勿上传未获授权的敏感资料。
+- 公式、表格、手写识别需人工核对。长文档应拆成知识点，以适配测评输入上限。
+
+OCR环境变量：BAIDU_OCR_API_KEY、BAIDU_OCR_SECRET_KEY。未配置专用密钥时尝试BAIDU_API_KEY、BAIDU_SECRET_KEY，但应用必须开通通用文字识别权限并有额度。收费与额度以百度控制台为准。文字文档和仅配图模式不需要OCR密钥。
+
+## 测试与构建
+
+```powershell
+cd feynman-platform-springboot
+.\mvnw.cmd package
+cd ..\feynman-platform-frontend
+npm run build
+npm run lint
+```
+
+OCR单元测试使用替身，不能证明生产环境OCR权限已开通。
+
+## 云端更新
+
+本地修改不会立即改变网站；提交并推送main后，Actions才会测试、构建、部署。完整说明见 [deploy/README.md](deploy/README.md)。
+
+不要提交密码、API密钥、私钥、真实用户数据或模型。自动部署不覆盖服务器启动脚本和模型。

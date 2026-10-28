@@ -1,41 +1,24 @@
 @echo off
-chcp 65001 >nul
 setlocal
-
-echo ========================================
-echo   费曼学习平台 - 一键启动
-echo ========================================
-echo.
-
-if not exist "%~dp0feynman-platform-backend" (
-	echo [Error] 当前目录不正确，未找到 feynman-platform-backend
-	pause
-	exit /b 1
+cd /d "%~dp0"
+if not exist "feynman-platform-springboot\mvnw.cmd" (
+  echo Spring Boot backend not found.
+  pause
+  exit /b 1
 )
-
-if not exist "%~dp0feynman-platform-frontend" (
-	echo [Error] 当前目录不正确，未找到 feynman-platform-frontend
-	pause
-	exit /b 1
+if not defined DB_PASSWORD (
+  echo Set DB_PASSWORD and JWT_SECRET first. See README.md.
+  pause
+  exit /b 1
 )
-
-:: 启动后端服务
-echo [1/2] 启动后端服务...
-start "Feynman Backend" cmd /k "cd /d %~dp0feynman-platform-backend && npm run dev"
-
-:: 等待后端启动
-timeout /t 3 /nobreak >nul
-
-:: 启动前端 (Electron 开发模式)
-echo [2/2] 启动前端 Electron...
-start "Feynman Frontend" cmd /k "cd /d %~dp0feynman-platform-frontend && npm run electron:dev"
-
-echo.
-echo ========================================
-echo   启动完成！
-echo   - 后端: http://localhost:3000
-echo   - 前端: http://127.0.0.1:5174
-echo   - Electron 窗口将自动打开
-echo ========================================
-echo.
+if not defined JWT_SECRET (
+  echo Set JWT_SECRET first. See README.md.
+  pause
+  exit /b 1
+)
+set "VITE_API_URL=http://localhost:8080/api"
+start "Feynman Backend" /D "%~dp0feynman-platform-springboot" cmd /k mvnw.cmd spring-boot:run
+start "Feynman Frontend" /D "%~dp0feynman-platform-frontend" cmd /k npm run dev
+echo Backend: http://localhost:8080/api/health
+echo Frontend: see the address printed by Vite.
 pause

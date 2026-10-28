@@ -9,4 +9,7 @@ public record FollowUpQuestionsRequest(
         @NotNull JsonNode evaluationResult,
         @NotBlank @Size(max = 20000) String originalContent
 ) {
+    public FollowUpQuestionsRequest {
+        originalContent = com.feynman.platform.common.LearningText.plain(originalContent);
+    }
 }

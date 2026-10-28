@@ -11,7 +11,7 @@ public class RagTextSplitter {
 
     public List<String> split(String text) {
         if (text == null || text.isBlank()) return List.of();
-        String normalized = text.replace("\r\n", "\n").replace('\r', '\n').trim();
+        String normalized = com.feynman.platform.common.LearningText.plain(text).replace("\r\n", "\n").replace('\r', '\n').trim();
         List<String> chunks = new ArrayList<>();
         int start = 0;
         while (start < normalized.length()) {

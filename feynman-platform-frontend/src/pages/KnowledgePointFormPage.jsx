@@ -9,6 +9,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import QuillMarkdown from 'quilljs-markdown';
 import AppIcon from '../components/ui/AppIconFixed.jsx';
+import DocumentImportPanel from '../components/DocumentImportPanel';
 import './KnowledgePointFormPage.css';
 
 function KnowledgePointFormPage() {
@@ -158,6 +159,11 @@ function KnowledgePointFormPage() {
             {/* 表单卡片 */}
             <div className="kp-form-card">
                 <form onSubmit={handleSubmit}>
+                    <DocumentImportPanel key={id || 'new'} disabled={loading} onImport={({ title: importedTitle, html, replace }) => {
+                        if (replace && content.trim() && !window.confirm('确认用解析结果替换已有正文？')) return false;
+                        setTitle((previous) => previous.trim() ? previous : importedTitle);
+                        setContent((previous) => replace ? html : previous + html);
+                    }} />
                     {/* 标题输入 */}
                     <div className="form-group">
                         <label className="form-label"> 标题</label>

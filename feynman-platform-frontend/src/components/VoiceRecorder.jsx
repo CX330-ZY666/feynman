@@ -134,14 +134,13 @@ function VoiceRecorder({ onTranscribeComplete, relatedId, transcribedText, onTex
         onTranscribeComplete(text);
       }
     } catch (error) {
-      const status = error?.response?.status;
       const suggestion = error?.response?.data?.suggestion || '';
       const isBackendOffline =
         !error?.response &&
         (error?.code === 'ERR_NETWORK' || String(error?.message || '').toLowerCase().includes('network'));
 
       const errorMsg = isBackendOffline
-        ? '无法连接后端服务（localhost:3000），请先启动后端'
+        ? '无法连接后端服务，请检查网络或服务运行状态'
         :
         error?.response?.data?.msg ||
         error?.response?.data?.error ||

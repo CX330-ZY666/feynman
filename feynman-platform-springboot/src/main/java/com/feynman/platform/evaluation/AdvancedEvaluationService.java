@@ -41,6 +41,7 @@ public class AdvancedEvaluationService {
         if (request.knowledgePointId() != null) {
             original = requireOwnedPoint(userId, request.knowledgePointId()).getContent();
         }
+        original = com.feynman.platform.common.LearningText.plain(original);
         if (original == null || original.isBlank()) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "ORIGINAL_CONTENT_REQUIRED", "originalContent is required");
         }

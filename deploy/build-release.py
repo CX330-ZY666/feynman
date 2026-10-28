@@ -11,6 +11,7 @@ root = Path(__file__).resolve().parents[1]
 jar = root / "feynman-platform-springboot/target/feynman-platform-springboot-0.0.1-SNAPSHOT.jar"
 dist = root / "feynman-platform-frontend/dist"
 revision = sys.argv[1] if len(sys.argv) > 1 else "local"
+baseline = json.loads((root / "deploy/runtime-libraries-baseline.json").read_text(encoding="utf-8"))
 with tempfile.TemporaryDirectory() as temp:
     release = Path(temp) / "release"
     release.mkdir()
@@ -23,7 +24,12 @@ with tempfile.TemporaryDirectory() as temp:
     with zipfile.ZipFile(jar) as original, zipfile.ZipFile(slim, "w") as output:
         for entry in original.infolist():
             if entry.filename.startswith("BOOT-INF/lib/") and not entry.is_dir():
-                libraries[entry.filename] = hashlib.sha256(original.read(entry)).hexdigest()
+                digest = hashlib.sha256(original.read(entry)).hexdigest()
+                if baseline.get(entry.filename) == digest:
+                    libraries[entry.filename] = digest
+                else:
+                    # New/changed dependencies travel in the small package; existing baseline libraries are reused.
+                    output.writestr(entry, original.read(entry))
             else:
                 output.writestr(entry, original.read(entry))
     if not libraries:

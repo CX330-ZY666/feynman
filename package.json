@@ -1,8 +1,12 @@
 {
   "name": "feynman-platform",
   "version": "1.0.0",
+  "private": true,
   "scripts": {
-    "start": "cd feynman-platform-backend && npm start",
-    "build": "cd feynman-platform-backend && npm install"
+    "start": "npm run frontend:dev",
+    "frontend:dev": "npm --prefix feynman-platform-frontend run dev",
+    "backend:dev": "cd feynman-platform-springboot && mvnw.cmd spring-boot:run",
+    "build": "npm --prefix feynman-platform-frontend run build",
+    "backend:build": "cd feynman-platform-springboot && mvnw.cmd package"
   }
 }

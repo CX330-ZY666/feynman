@@ -9,4 +9,7 @@ public record EvaluateStagedRequest(
         @NotBlank @Size(max = 5000) String transcribedText,
         @Pattern(regexp = "[0-9a-fA-F]{24}") String knowledgePointId
 ) {
+    public EvaluateStagedRequest {
+        originalContent = com.feynman.platform.common.LearningText.plain(originalContent);
+    }
 }
