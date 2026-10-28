@@ -8,6 +8,7 @@ import RelationshipManager from '../components/RelationshipManager';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import QuillMarkdown from 'quilljs-markdown';
+import AppIcon from '../components/ui/AppIconFixed.jsx';
 import './KnowledgePointFormPage.css';
 
 function KnowledgePointFormPage() {
@@ -136,8 +137,11 @@ function KnowledgePointFormPage() {
         <div className="kp-form-container">
             {/* 页面头部 */}
             <div className="kp-form-header">
-                <Link to="/" className="back-link">← 返回列表</Link>
-                <h1>{isEditing ? '✏️ 编辑知识点' : '✨ 新建知识点'}</h1>
+                <Link to="/" className="back-link"><AppIcon name="back" size={18} accent="#A9BED3" />返回列表</Link>
+                <div className="kp-form-title-row">
+                    <span className="kp-form-title-icon"><AppIcon name={isEditing ? 'edit' : 'add'} size={28} accent={isEditing ? '#A9BED3' : '#E99AA8'} /></span>
+                    <div><small>KNOWLEDGE NOTE</small><h1>{isEditing ? '编辑知识点' : '新建知识点'}</h1></div>
+                </div>
                 {isEditing && (
                     <div className="kp-form-meta">
                         ID: {id} · 标题长度: {title.length} · 内容长度: {content.length}
@@ -149,14 +153,14 @@ function KnowledgePointFormPage() {
             {loading && <div className="kp-form-loading">加载中...</div>}
             
             {/* 错误提示 */}
-            {!!error && <div className="kp-form-error">❌ {error}</div>}
+            {!!error && <div className="kp-form-error"> {error}</div>}
 
             {/* 表单卡片 */}
             <div className="kp-form-card">
                 <form onSubmit={handleSubmit}>
                     {/* 标题输入 */}
                     <div className="form-group">
-                        <label className="form-label">📌 标题</label>
+                        <label className="form-label"> 标题</label>
                         <input 
                             type="text" 
                             value={title} 
@@ -168,7 +172,7 @@ function KnowledgePointFormPage() {
 
                     {/* 学习状态选择 */}
                     <div className="form-group">
-                        <label className="form-label">📈 学习状态</label>
+                        <label className="form-label"> 学习状态</label>
                         <select
                             value={status}
                             onChange={(e) => setStatus(e.target.value)}
@@ -188,14 +192,14 @@ function KnowledgePointFormPage() {
                     {/* 内容输入 */}
                     <div className="form-group">
                         <div className="content-header">
-                            <label className="form-label">📝 内容</label>
+                            <label className="form-label"> 内容</label>
                             {!isEditing && (
                                 <button 
                                     type="button" 
                                     onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
                                     className={`voice-btn ${showVoiceRecorder ? 'active' : ''}`}
                                 >
-                                    {showVoiceRecorder ? '🔽 隐藏语音' : '🎤 添加语音'}
+                                    {showVoiceRecorder ? ' 隐藏语音' : ' 添加语音'}
                                 </button>
                             )}
                         </div>
@@ -223,7 +227,7 @@ function KnowledgePointFormPage() {
 
                     {/* 提交按钮 */}
                     <button type="submit" className="submit-btn" disabled={loading}>
-                        {loading ? '保存中...' : (isEditing ? '💾 更新知识点' : '🚀 创建知识点')}
+                        {loading ? '保存中...' : (isEditing ? ' 更新知识点' : ' 创建知识点')}
                     </button>
                 </form>
             </div>

@@ -9,6 +9,9 @@ export default defineConfig(({ mode }) => {
   const enablePwa = mode === 'production' && process.env.VITE_ENABLE_PWA === 'true'
   return {
   base: mode === 'production' ? './' : '/',
+  build: {
+    target: ['chrome91', 'es2019'],
+  },
   plugins: [
     react(),
     enablePwa && VitePWA({

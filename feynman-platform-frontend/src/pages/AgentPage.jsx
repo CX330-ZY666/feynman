@@ -1,6 +1,7 @@
 // src/pages/AgentPage.jsx
 import { useState, useRef, useEffect } from 'react';
 import apiClient from '../api/axios';
+import AppIcon from '../components/ui/AppIconFixed.jsx';
 import './AgentPage.css';
 
 function AgentPage() {
@@ -100,7 +101,7 @@ function AgentPage() {
                                 setMessages(prev => {
                                     const newMessages = [...prev];
                                     if (!newMessages[newMessages.length - 1].text) {
-                                        newMessages[newMessages.length - 1].text = '⚠️ AI 服务出现异常，请稍后再试。';
+                                        newMessages[newMessages.length - 1].text = ' AI 服务出现异常，请稍后再试。';
                                     }
                                     return newMessages;
                                 });
@@ -116,7 +117,7 @@ function AgentPage() {
             setMessages(prev => {
                 const newMessages = [...prev];
                 if (!newMessages[newMessages.length - 1].text) {
-                    newMessages[newMessages.length - 1].text = '⚠️ 网络请求失败，请检查网络后重试。';
+                    newMessages[newMessages.length - 1].text = ' 网络请求失败，请检查网络后重试。';
                 }
                 return newMessages;
             });
@@ -130,9 +131,9 @@ function AgentPage() {
             {/* 页面头部 */}
             <div className="agent-header">
                 <div className="agent-header-content">
-                    <div className="agent-avatar">😊</div>
+                    <div className="agent-avatar" aria-hidden="true"><AppIcon name="assistant" size={30} accent="#A9BED3" /></div>
                     <div className="agent-info">
-                        <h1>💬 AI 智能助手</h1>
+                        <h1> AI 智能助手</h1>
                         <p>基于你的知识库，智能回答问题</p>
                     </div>
                 </div>
@@ -146,7 +147,7 @@ function AgentPage() {
             <div className="chat-window">
                 {messages.map((msg, index) => (
                     <div key={index} className={`message ${msg.sender}`}>
-                        <div className={`message-avatar${msg.sender === 'user' ? ' user-avatar' : ''}`}>😊</div>
+                        <div className={`message-avatar${msg.sender === 'user' ? ' user-avatar' : ''}`} aria-hidden="true"><AppIcon name={msg.sender === 'user' ? 'user' : 'assistant'} size={22} accent={msg.sender === 'user' ? '#E99AA8' : '#A9BED3'} /></div>
                         <div className="message-content">
                             <div className="message-bubble">
                                 {msg.sender === 'bot' && !msg.text && isLoading && index === messages.length - 1
@@ -156,7 +157,7 @@ function AgentPage() {
                             {msg.sources && msg.sources.length > 0 && (
                                 <div className="message-sources">
                                     <details>
-                                        <summary>📚 参考来源 ({msg.sources.length})</summary>
+                                        <summary> 参考来源 ({msg.sources.length})</summary>
                                         {msg.sources.map((source, idx) => {
                                             // 清理HTML标签
                                             const cleanContent = source.content ? source.content.replace(/<\/?[^>]+(>|$)/g, ' ').replace(/\s+/g, ' ').trim() : '';
@@ -189,9 +190,9 @@ function AgentPage() {
                 </div>
                 <button type="submit" disabled={isLoading || !inputValue.trim()}>
                     {isLoading ? (
-                        <>✨ 思考中...</>
+                        <> 思考中...</>
                     ) : (
-                        <>🚀 发送</>
+                        <> 发送</>
                     )}
                 </button>
             </form>

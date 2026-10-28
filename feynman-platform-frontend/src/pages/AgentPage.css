@@ -333,3 +333,8 @@
 .chat-window::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
 }
+
+/* Unified assistant and user avatars */
+.agent-page .agent-avatar{width:54px;height:54px;background:#e5eef2!important;border:3px solid #303330!important;border-radius:16px!important;box-shadow:0 3px 0 #303330!important;backdrop-filter:none}
+.agent-page .message-avatar{width:42px;height:42px;background:#e5eef2!important;border:2px solid #303330!important;border-radius:13px!important;box-shadow:0 3px 0 #303330!important}
+.agent-page .message-avatar.user-avatar{background:#f3d7dc!important;box-shadow:0 3px 0 #303330!important}

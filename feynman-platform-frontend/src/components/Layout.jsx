@@ -28,12 +28,12 @@ function Layout() {
         <div className="nav-links">
           {token ? (
             <>
-              <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>🏠 主页</Link>
-              <Link to="/agent" className={`nav-link nav-link-ai ${location.pathname === '/agent' ? 'active' : ''}`}>🤖 AI助手</Link>
-              <Link to="/feynman-practice" className={`nav-link nav-link-feynman ${location.pathname.startsWith('/feynman-practice') ? 'active' : ''}`}>🎓 费曼问答</Link>
-              <Link to="/graph" className={`nav-link nav-link-graph ${location.pathname === '/graph' ? 'active' : ''}`}>🔗 知识图谱</Link>
-              <Link to="/3d-world" className={`nav-link nav-link-3d ${location.pathname === '/3d-world' ? 'active' : ''}`}>🌐 3D 视界</Link>
-              <Link to="/knowledge-universe" className={`nav-link nav-link-universe ${location.pathname === '/knowledge-universe' ? 'active' : ''}`}>✨ 知识宇宙</Link>
+              <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}> 主页</Link>
+              <Link to="/agent" className={`nav-link nav-link-ai ${location.pathname === '/agent' ? 'active' : ''}`}> AI助手</Link>
+              <Link to="/feynman-practice" className={`nav-link nav-link-feynman ${location.pathname.startsWith('/feynman-practice') ? 'active' : ''}`}> 费曼问答</Link>
+              <Link to="/graph" className={`nav-link nav-link-graph ${location.pathname === '/graph' ? 'active' : ''}`}> 知识图谱</Link>
+              <Link to="/3d-world" className={`nav-link nav-link-3d ${location.pathname === '/3d-world' ? 'active' : ''}`}> 3D 视界</Link>
+              <Link to="/knowledge-universe" className={`nav-link nav-link-universe ${location.pathname === '/knowledge-universe' ? 'active' : ''}`}> 知识宇宙</Link>
             </>
           ) : (
             <>

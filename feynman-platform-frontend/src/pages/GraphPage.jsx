@@ -353,7 +353,7 @@ function GraphPage() {
     return (
       <div className="graph-page-container">
         <div className="graph-empty-overlay">
-           <div className="empty-icon">❌</div>
+           <div className="empty-icon"></div>
            <h3>{error}</h3>
         </div>
       </div>
@@ -368,13 +368,13 @@ function GraphPage() {
       <div className="graph-canvas-layer">
         {isEmpty ? (
            <div className="graph-empty-overlay">
-             <div className="empty-icon">🕸️</div>
+             <div className="empty-icon"></div>
              <h2>还没有知识节点</h2>
              <p style={{ color: '#6b7280', margin: '12px 0 24px' }}>
                创建第一个知识点，即可开启你的知识图谱之旅。
              </p>
              <button className="graph-btn graph-btn-primary" onClick={() => navigate('/kp/new')}>
-               ✨ 创建知识点
+                创建知识点
              </button>
            </div>
         ) : (
@@ -395,7 +395,7 @@ function GraphPage() {
           <header className="graph-floating-header graph-glass-panel">
             <div className="graph-header-left">
               <div className="graph-title">
-                <span>🔗</span> 知识图谱
+                <span></span> 知识图谱
               </div>
               <div className="graph-stats-pill">
                 <span>节点 <b>{stats.nodeCount}</b></span>
@@ -404,7 +404,7 @@ function GraphPage() {
             </div>
 
             <div className="graph-search-container">
-              <span className="graph-search-icon">🔍</span>
+              <span className="graph-search-icon"></span>
               <input 
                 className="graph-search-input"
                 value={searchQuery}
@@ -488,10 +488,10 @@ function GraphPage() {
 
                  <div className="inspector-actions">
                    <button className="action-btn feynman" onClick={() => navigate(`/feynman/${selectedNode.id}`)}>
-                     🎤 开始费曼练习
+                      开始费曼练习
                    </button>
                    <button className="action-btn edit" onClick={() => navigate(`/kp/edit/${selectedNode.id}`)}>
-                     ✏️ 编辑知识点
+                      编辑知识点
                    </button>
                  </div>
                </>

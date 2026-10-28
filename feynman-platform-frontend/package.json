@@ -13,6 +13,7 @@
     "electron:build": "npm run build && electron-builder"
   },
   "dependencies": {
+    "@icon-park/react": "^1.4.2",
     "@tiptap/extension-code-block": "^3.10.7",
     "@tiptap/extension-placeholder": "^3.10.7",
     "@tiptap/extension-table": "^3.10.7",

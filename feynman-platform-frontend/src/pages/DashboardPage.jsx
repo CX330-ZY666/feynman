@@ -11,6 +11,7 @@ import 'katex/dist/katex.min.css';
 import mermaid from 'mermaid';
 import DOMPurify from 'dompurify';
 import { PRESET_TAGS, getTagConfig } from '../utils/tagConfig';
+import AppIcon from '../components/ui/AppIconFixed';
 import './DashboardPage.css';
 
 // 用于自动匹配的关键词配置（当没有存储标签时作为回退）
@@ -110,7 +111,7 @@ function DashboardPage() {
   );
   if (error) return (
     <div className="dashboard-container">
-      <div className="error-state">❌ {error}</div>
+      <div className="error-state"> {error}</div>
     </div>
   );
 
@@ -163,8 +164,13 @@ function DashboardPage() {
       {showSidebar && (
         <aside className="sidebar">
           <div className="sidebar-header">
-            <h3>📚 知识点目录</h3>
-            <button className="sidebar-close" onClick={() => setShowSidebar(false)}>×</button>
+            <div className="sidebar-heading">
+              <span><AppIcon name="list" size={22} accent="#EFD46D" /></span>
+              <div><small>QUICK INDEX</small><h3>知识点目录</h3></div>
+            </div>
+            <button className="sidebar-close" onClick={() => setShowSidebar(false)} aria-label="关闭标题目录">
+              <AppIcon name="close" size={18} accent="#E99AA8" />
+            </button>
           </div>
           <ul className="sidebar-list">
             {filteredKnowledgePoints.map((kp, index) => (
@@ -175,7 +181,7 @@ function DashboardPage() {
               >
                 <span className="sidebar-index">{index + 1}</span>
                 <span className="sidebar-title">{kp.title}</span>
-                {kp.reviewList && <span className="sidebar-badge">⚠️</span>}
+                {kp.reviewList && <span className="sidebar-badge" title="待复习"><AppIcon name="timer" size={15} accent="#E99AA8" /></span>}
               </li>
             ))}
           </ul>
@@ -187,15 +193,15 @@ function DashboardPage() {
         {/* 页面头部 */}
         <div className="dashboard-header">
           <div className="header-info">
-            <h1>📚 我的知识点</h1>
+            <h1> 我的知识点</h1>
             <div className="header-stats">
-              <span className="stat-item">📖 总计 <span className="stat-value">{safeKnowledgePoints.length}</span> 个</span>
-              <span className="stat-item">🔔 待复习 <span className="stat-value">{reviewCount}</span> 个</span>
+              <span className="stat-item"> 总计 <span className="stat-value">{safeKnowledgePoints.length}</span> 个</span>
+              <span className="stat-item"> 待复习 <span className="stat-value">{reviewCount}</span> 个</span>
             </div>
           </div>
           {/* 搜索框 */}
           <div className="search-box">
-            <span className="search-icon">🔍</span>
+            <span className="search-icon"><AppIcon name="search" size={20} accent="#A9BED3" /></span>
             <input
               type="text"
               placeholder="搜索知识点..."
@@ -214,7 +220,7 @@ function DashboardPage() {
               onChange={(e) => setTagFilter(e.target.value)}
               className="tag-select"
             >
-              <option value="">🏷️ 全部标签</option>
+              <option value=""> 全部标签</option>
               {Object.entries(allTags).sort((a, b) => b[1] - a[1]).map(([tag, count]) => {
                 const config = getTagConfig(tag);
                 return (
@@ -230,15 +236,15 @@ function DashboardPage() {
               onClick={() => setShowSidebar(!showSidebar)}
               className={`btn btn-browse ${showSidebar ? 'active' : ''}`}
             >
-              📊 {showSidebar ? '隐藏目录' : '标题浏览'}
+               {showSidebar ? '隐藏目录' : '标题浏览'}
             </button>
             <button 
               onClick={() => setFilterReview(!filterReview)}
               className={`btn btn-review ${filterReview ? 'active' : ''}`}
             >
-              {filterReview ? '🔍 查看所有' : `⚠️ 需复习 (${reviewCount})`}
+              {filterReview ? ' 查看所有' : ` 需复习 (${reviewCount})`}
             </button>
-            <Link to="/kp/new" className="btn btn-create">✨ 新建知识点</Link>
+            <Link to="/kp/new" className="btn btn-create"> 新建知识点</Link>
           </div>
         </div>
 
@@ -246,7 +252,7 @@ function DashboardPage() {
         <div>
         {filteredKnowledgePoints.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-icon">{filterReview ? '🎉' : '📝'}</div>
+            <div className="empty-icon">{filterReview ? '' : ''}</div>
             <h3 className="empty-title">
               {filterReview ? '太棒了！没有需要复习的知识点' : '还没有知识点'}
             </h3>
@@ -265,7 +271,7 @@ function DashboardPage() {
               >
                 {/* 复习标记 */}
                 {kp.reviewList && (
-                  <span className="review-badge">⚠️ 需复习</span>
+                  <span className="review-badge"> 需复习</span>
                 )}
                 
                 {/* 标题行：标签 + 标题 */}
@@ -324,11 +330,11 @@ function DashboardPage() {
                   )}
                 </div>
                 <div className="kp-actions">
-                  <Link to={`/kp/edit/${kp._id}`} className="kp-btn kp-btn-edit">✏️ 编辑</Link>
-                  <button onClick={() => handleDelete(kp._id)} className="kp-btn kp-btn-delete">🗑️ 删除</button>
-                  <Link to={`/feynman/${kp._id}`} className="kp-btn kp-btn-feynman">🎤 开始复述</Link>
-                  <Link to={`/feynman-practice/${kp._id}`} className="kp-btn kp-btn-practice">🎓 费曼练习</Link>
-                  <Link to={`/quiz/${kp._id}`} className="kp-btn kp-btn-quiz">📝 开始测评</Link>
+                  <Link to={`/kp/edit/${kp._id}`} className="kp-btn kp-btn-edit"> 编辑</Link>
+                  <button onClick={() => handleDelete(kp._id)} className="kp-btn kp-btn-delete"> 删除</button>
+                  <Link to={`/feynman/${kp._id}`} className="kp-btn kp-btn-feynman"> 开始复述</Link>
+                  <Link to={`/feynman-practice/${kp._id}`} className="kp-btn kp-btn-practice"> 费曼练习</Link>
+                  <Link to={`/quiz/${kp._id}`} className="kp-btn kp-btn-quiz"> 开始测评</Link>
                 </div>
               </li>
             ))}

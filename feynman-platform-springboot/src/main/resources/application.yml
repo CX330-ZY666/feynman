@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: feynman-platform-springboot
+  profiles:
+    default: local
+
+server:
+  port: ${SERVER_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when_authorized
+

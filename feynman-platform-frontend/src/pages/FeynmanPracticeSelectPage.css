@@ -383,3 +383,27 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* 2026 unified Feynman selection UI */
+.feynman-select-container{min-height:100%;padding:0 0 36px;background:transparent;color:#303330}
+.feynman-select-container .select-header{max-width:1400px;margin:0 auto 22px;padding:24px 26px;text-align:left;background:#fffefa;border:3px solid #303330;border-radius:22px;box-shadow:0 5px 0 #303330}
+.feynman-select-container .select-header h1{margin:0 0 8px;color:#303330;background:none;-webkit-text-fill-color:initial;font-size:clamp(26px,3vw,38px);letter-spacing:-.04em}
+.feynman-select-container .header-desc{max-width:780px;margin:0;color:#6f746e;font-size:15px}
+.feynman-select-container .filter-bar{max-width:1400px;margin:0 auto 22px;padding:14px;background:#efd46d;border:3px solid #303330;border-radius:16px;box-shadow:0 4px 0 #303330}
+.feynman-select-container .search-box input{height:48px;padding:0 44px 0 16px;background:#fffefa;color:#303330;border:2px solid #303330;border-radius:11px}
+.feynman-select-container .search-icon{display:none}.feynman-select-container .clear-btn{right:10px;background:#efc3ca;color:#303330;border:2px solid #303330;border-radius:8px}
+.feynman-select-container .category-btn{padding:10px 16px;background:#fffefa;color:#303330;border:2px solid #303330;border-radius:999px;font-weight:700;box-shadow:0 2px 0 #303330}
+.feynman-select-container .category-btn.active{background:#c9c3df;color:#303330;border-color:#303330}
+.feynman-select-container .kp-grid{max-width:1400px;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.feynman-select-container .kp-card{min-height:210px;padding:20px;background:#fffefa;color:#303330;border:3px solid #303330;border-radius:18px;box-shadow:0 4px 0 #303330;transform:none}
+.feynman-select-container .kp-card:nth-child(3n+2){background:#f5eee1}.feynman-select-container .kp-card:nth-child(3n+3){background:#edf2ef}
+.feynman-select-container .kp-card:hover{background:#fffefa;border-color:#303330;transform:translateY(-3px);box-shadow:0 7px 0 #303330}
+.feynman-select-container .kp-card-header h3{color:#303330;font-size:18px}.feynman-select-container .kp-category{background:#c9c3df;color:#303330;border:2px solid #303330}
+.feynman-select-container .kp-content{color:#6f746e}.feynman-select-container .kp-card-footer{border-top:2px solid #303330}
+.feynman-select-container .kp-status{color:#303330!important;border:2px solid #303330;border-radius:999px;background:#a9bed3!important}
+.feynman-select-container .status-mastered{background:#bcd4bf!important}.feynman-select-container .status-reviewing{background:#efd46d!important}
+.feynman-select-container .start-practice-btn,.feynman-select-container .create-btn{padding:9px 14px;background:#e99aa8;color:#303330;border:2px solid #303330;border-radius:10px;box-shadow:0 3px 0 #303330;font-weight:700}
+.feynman-select-container .tips-section{max-width:1400px;margin-top:28px;padding:24px;background:#fffefa;border:3px solid #303330;border-radius:18px;box-shadow:0 4px 0 #303330}
+.feynman-select-container .tips-section h3,.feynman-select-container .tip-item strong{color:#303330}.feynman-select-container .tip-item p{color:#6f746e}.feynman-select-container .tip-number{background:#efd46d;color:#303330;border:2px solid #303330;border-radius:10px}
+@media(max-width:1100px){.feynman-select-container .kp-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.feynman-select-container .filter-bar{align-items:stretch}.feynman-select-container .kp-grid{grid-template-columns:1fr}}

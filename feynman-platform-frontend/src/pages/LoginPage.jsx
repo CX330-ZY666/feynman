@@ -3,6 +3,7 @@ import { useState } from 'react';
 import apiClient from '../api/axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import AppIcon from '../components/ui/AppIconFixed.jsx';
 import './AuthPage.css';
 
 function LoginPage() {
@@ -47,7 +48,7 @@ function LoginPage() {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
-          <div className="auth-icon">🔐</div>
+          <div className="auth-icon" aria-hidden="true"><AppIcon name="assistant" size={58} accent="#A9BED3" /></div>
           <h1>欢迎回来</h1>
           <p>登录你的账户继续学习</p>
         </div>
@@ -56,12 +57,12 @@ function LoginPage() {
           <form className="auth-form" onSubmit={handleSubmit}>
             {error && (
               <div className="auth-error">
-                <span>⚠️</span> {error}
+                <span></span> {error}
               </div>
             )}
             
             <div className="form-group">
-              <label>📧 邮箱地址</label>
+              <label> 邮箱地址</label>
               <input 
                 name="email"
                 type="email" 
@@ -73,7 +74,7 @@ function LoginPage() {
             </div>
             
             <div className="form-group">
-              <label>🔒 密码</label>
+              <label> 密码</label>
               <input 
                 name="password"
                 type="password" 
@@ -88,7 +89,7 @@ function LoginPage() {
               {loading ? (
                 <span className="auth-loading">登录中</span>
               ) : (
-                '🚀 登录'
+                ' 登录'
               )}
             </button>
           </form>

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import apiClient from '../api/axios';
 import { useNavigate, Link } from 'react-router-dom';
+import AppIcon from '../components/ui/AppIconFixed.jsx';
 import './AuthPage.css';
 
 function RegisterPage() {
@@ -69,7 +70,7 @@ function RegisterPage() {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
-          <div className="auth-icon">✨</div>
+          <div className="auth-icon" aria-hidden="true"><AppIcon name="assistant" size={58} accent="#E99AA8" /></div>
           <h1>创建账户</h1>
           <p>加入我们，开始你的学习之旅</p>
         </div>
@@ -78,18 +79,18 @@ function RegisterPage() {
           <form className="auth-form" onSubmit={handleSubmit}>
             {error && (
               <div className="auth-error">
-                <span>⚠️</span> {error}
+                <span></span> {error}
               </div>
             )}
             
             {success && (
               <div className="auth-success">
-                <span>✅</span> {success}
+                <span></span> {success}
               </div>
             )}
             
             <div className="form-group">
-              <label>👤 用户名</label>
+              <label> 用户名</label>
               <input 
                 name="username"
                 type="text" 
@@ -101,7 +102,7 @@ function RegisterPage() {
             </div>
             
             <div className="form-group">
-              <label>📧 邮箱地址</label>
+              <label> 邮箱地址</label>
               <input 
                 name="email"
                 type="email" 
@@ -113,7 +114,7 @@ function RegisterPage() {
             </div>
             
             <div className="form-group">
-              <label>🔒 设置密码</label>
+              <label> 设置密码</label>
               <input 
                 name="password"
                 type="password" 
@@ -139,7 +140,7 @@ function RegisterPage() {
             </div>
             
             <div className="form-group">
-              <label>🔁 确认密码</label>
+              <label> 确认密码</label>
               <input 
                 name="confirmPassword"
                 type="password" 
@@ -154,7 +155,7 @@ function RegisterPage() {
               {loading ? (
                 <span className="auth-loading">注册中</span>
               ) : (
-                '🚀 立即注册'
+                ' 立即注册'
               )}
             </button>
           </form>

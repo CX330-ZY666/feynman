@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import DOMPurify from 'dompurify';
 import apiClient from '../api/axios';
+import AppIcon from '../components/ui/AppIconFixed.jsx';
 import './ThreeJSPage.css';
 
 function ThreeJSPage() {
@@ -772,7 +773,7 @@ function ThreeJSPage() {
                 className="threejs-page-canvas"
             />
             {/* 搜索框 */}
-            <div style={{
+            <div className="immersive-search-area" style={{
                 position: 'fixed',
                 top: '100px',
                 left: '50%',
@@ -784,7 +785,7 @@ function ThreeJSPage() {
                 gap: '8px'
             }}>
                 {/* 搜索输入框 */}
-                <div style={{
+                <div className="immersive-search-box" style={{
                     background: 'rgba(10, 15, 30, 0.9)',
                     backdropFilter: 'blur(10px)',
                     borderRadius: '12px',
@@ -795,12 +796,13 @@ function ThreeJSPage() {
                     gap: '10px',
                     width: '320px'
                 }}>
-                    <span style={{ fontSize: '16px', opacity: 0.6 }}>🔍</span>
+                    <AppIcon name="search" size={22} accent="#A9BED3" />
                     <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="搜索知识点、标签、分类..."
+                        className="immersive-search-input"
                         style={{
                             flex: 1,
                             background: 'transparent',
@@ -813,6 +815,7 @@ function ThreeJSPage() {
                     {searchQuery && (
                         <button
                             onClick={() => setSearchQuery('')}
+                            className="immersive-search-clear"
                             style={{
                                 background: 'transparent',
                                 border: 'none',
@@ -828,7 +831,7 @@ function ThreeJSPage() {
                             }}
                             title="清除搜索"
                         >
-                            ×
+                            <AppIcon name="close" size={18} accent="#E99AA8" />
                         </button>
                     )}
                 </div>
@@ -913,7 +916,7 @@ function ThreeJSPage() {
                     });
                 }}
             >
-                {showEdges ? '🔗 隐藏连接线' : '🔗 显示连接线'}
+                {showEdges ? '隐藏连接线' : '显示连接线'}
             </button>
             
             {/* 悬停提示卡片 */}
@@ -946,7 +949,7 @@ function ThreeJSPage() {
                         alignItems: 'center',
                         gap: '8px'
                     }}>
-                        <span>🌟</span>
+                        <span>知识节点</span>
                         <span>{hoveredNodeData.title}</span>
                     </div>
                     <div 
@@ -975,7 +978,7 @@ function ThreeJSPage() {
                         color: '#999',
                         textAlign: 'center'
                     }}>
-                        💡 点击星球查看完整内容
+                        点击星球查看完整内容
                     </div>
                 </div>
             )}
@@ -1001,7 +1004,7 @@ function ThreeJSPage() {
                 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
                         <h3 style={{ margin: 0, fontSize: '22px', color: '#00ccff' }}>
-                            🪐 {selectedNodeData.title}
+                            {selectedNodeData.title}
                         </h3>
                         <button
                             onClick={() => setSelectedNodeData(null)}
@@ -1045,7 +1048,7 @@ function ThreeJSPage() {
                             fontSize: '13px',
                             color: '#00ccff'
                         }}>
-                            📂 分类: {selectedNodeData.category}
+                            分类: {selectedNodeData.category}
                         </div>
                     )}
                     
@@ -1071,7 +1074,7 @@ function ThreeJSPage() {
                                 alignItems: 'center',
                                 gap: '6px'
                             }}>
-                                <span>🏷️</span>
+                                <span>标签</span>
                                 <span>标签管理</span>
                             </div>
                             <button
@@ -1230,7 +1233,7 @@ function ThreeJSPage() {
                             color: '#666',
                             textAlign: 'center'
                         }}>
-                            💡 标签用于自动连接相关知识点
+                            标签用于自动连接相关知识点
                         </div>
                     </div>
                     {/* 编辑按钮 */}

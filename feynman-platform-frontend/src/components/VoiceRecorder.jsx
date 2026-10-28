@@ -30,10 +30,6 @@ function VoiceRecorder({ onTranscribeComplete, relatedId, transcribedText, onTex
   const [volume, setVolume] = useState(0);
   const [mediaBlobUrl, setMediaBlobUrl] = useState('');
   
-  // 转录方式与失败计数
-  const [transcriptionMethod, setTranscriptionMethod] = useState('baidu');
-  const [failureCount, setFailureCount] = useState(0);
-
   const timerRef = useRef(null);
   const recorderRef = useRef(null);
   const volumeRef = useRef(0);
@@ -118,9 +114,8 @@ function VoiceRecorder({ onTranscribeComplete, relatedId, transcribedText, onTex
       formData.append('durationSeconds', String(seconds));
       formData.append('mimeType', mime);
 
-      const endpoint = transcriptionMethod === 'whisper' ? '/audio/transcribe-local' : '/audio/transcribe';
-      console.info(`[VoiceRecorder] 使用 ${transcriptionMethod === 'whisper' ? 'Whisper' : '百度API'} 进行转录 -> ${endpoint}`);
-      const response = await apiClient.post(endpoint, formData, {
+      console.info('[VoiceRecorder] 使用在线语音识别进行转录 -> /audio/transcribe');
+      const response = await apiClient.post('/audio/transcribe', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
@@ -134,11 +129,6 @@ function VoiceRecorder({ onTranscribeComplete, relatedId, transcribedText, onTex
       const msg = response.data?.msg || response.data?.message || '';
       const text = result || msg || '转录结果为空，请稍后重试。';
       if (onTextChange) onTextChange(text); // 更新父组件文本
-
-      // 成功则重置 Whisper 失败计数
-      if (transcriptionMethod === 'whisper' && failureCount !== 0) {
-        setFailureCount(0);
-      }
 
       if (onTranscribeComplete) {
         onTranscribeComplete(text);
@@ -157,18 +147,6 @@ function VoiceRecorder({ onTranscribeComplete, relatedId, transcribedText, onTex
         error?.response?.data?.error ||
         error?.message ||
         '转录失败，请重试。';
-
-      // Whisper下的自动降级逻辑
-      if (transcriptionMethod === 'whisper' && (status === 503 || status === 504)) {
-        const newCount = failureCount + 1;
-        setFailureCount(newCount);
-        if (newCount >= 3) {
-          console.warn('Whisper 连续失败 3 次，自动切换到百度 API');
-          setTranscriptionMethod('baidu');
-          if (typeof window !== 'undefined') localStorage.setItem('transcriptionMethod', 'baidu');
-          setFailureCount(0);
-        }
-      }
 
       const text = `转录失败: ${errorMsg}${suggestion ? `，建议：${suggestion}` : ''}`;
       if (onTextChange) onTextChange(text); // 更新父组件错误文本
@@ -207,6 +185,7 @@ function VoiceRecorder({ onTranscribeComplete, relatedId, transcribedText, onTex
         type: 'audio',
         mimeType: 'audio/wav',
         recorderType: RecordRTC.StereoAudioRecorder,
+        desiredSampRate: 16000,
         numberOfAudioChannels: 1,
       });
       recorderRef.current = recorder;
@@ -272,25 +251,8 @@ function VoiceRecorder({ onTranscribeComplete, relatedId, transcribedText, onTex
       <h3>语音输入</h3>
 
       {/* 转录方式选择器 */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-        <span style={{ fontSize: '0.95rem', color: '#333' }}>转录方式：</span>
-        <button
-          onClick={() => { setTranscriptionMethod('whisper'); if (typeof window !== 'undefined') localStorage.setItem('transcriptionMethod', 'whisper'); setFailureCount(0); }}
-          disabled={isUploading || status !== 'idle'}
-          style={{ background: transcriptionMethod === 'whisper' ? '#2563eb' : '#e5e7eb', color: transcriptionMethod === 'whisper' ? '#fff' : '#111', border: 'none', borderRadius: 4, padding: '6px 10px' }}
-        >
-          🖥️ 本地 Whisper
-        </button>
-        <button
-          onClick={() => { setTranscriptionMethod('baidu'); if (typeof window !== 'undefined') localStorage.setItem('transcriptionMethod', 'baidu'); setFailureCount(0); }}
-          disabled={isUploading || status !== 'idle'}
-          style={{ background: transcriptionMethod === 'baidu' ? '#2563eb' : '#e5e7eb', color: transcriptionMethod === 'baidu' ? '#fff' : '#111', border: 'none', borderRadius: 4, padding: '6px 10px' }}
-        >
-          ☁️ 百度 API
-        </button>
-        {transcriptionMethod === 'whisper' && failureCount > 0 && (
-          <span style={{ color: '#d97706', marginLeft: 8 }}>⚠️ 本地 Whisper 已失败 {failureCount} 次，连续失败 3 次将自动切换至百度 API</span>
-        )}
+      <div style={{ marginBottom: 8, fontSize: '0.95rem', color: '#333' }}>
+        转录方式：☁️ 在线语音识别
       </div>
 
       {/* 录音控制区 */}
@@ -324,11 +286,11 @@ function VoiceRecorder({ onTranscribeComplete, relatedId, transcribedText, onTex
 
       <div style={{ marginBottom: 12 }}>
         <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', color: '#374151' }}>
-          📝 转录文本（可编辑）：
+           转录文本（可编辑）：
         </label>
         {isUploading && (
           <p style={{ color: '#666', fontSize: '0.9rem', margin: '8px 0' }}>
-            {transcriptionMethod === 'whisper' ? '🖥️ 使用本地 Whisper 转录中...' : '☁️ 使用百度 API 转录中...'}
+            ☁️ 在线语音识别转录中...
           </p>
         )}
         <textarea
@@ -353,7 +315,7 @@ function VoiceRecorder({ onTranscribeComplete, relatedId, transcribedText, onTex
         />
         {transcribedText && !isUploading && (
           <p style={{ fontSize: '0.85rem', color: '#6b7280', marginTop: '6px', marginBottom: 0 }}>
-            ✨ 提示：请检查并修正转录错误，然后点击「提交 AI 评估」
+             提示：请检查并修正转录错误，然后点击「提交 AI 评估」
           </p>
         )}
       </div>

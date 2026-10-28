@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import apiClient from '../api/axios';
+import AppIcon from '../components/ui/AppIconFixed';
 import './QuizPage.css';
 
 function QuizPage() {
@@ -239,7 +240,7 @@ function QuizPage() {
   const updateReviewStatus = async (needsReview) => {
     try {
       await apiClient.put(`/knowledge-points/${id}`, { reviewList: needsReview });
-      console.log(`✅ 已${needsReview ? '加入' : '移除'}复习列表`);
+      console.log(` 已${needsReview ? '加入' : '移除'}复习列表`);
     } catch (error) {
       console.error('更新复习状态失败:', error);
     }
@@ -251,8 +252,19 @@ function QuizPage() {
     <div className="quiz-container">
       {/* 页面头部 */}
       <div className="quiz-header">
-        <Link to="/" className="back-link">← 返回列表</Link>
-        <h1>📝 知识点测评: <span className="kp-title">{knowledgePoint.title}</span></h1>
+        <Link to="/" className="back-link">
+          <AppIcon name="back" size={18} accent="#A9BED3" />
+          返回列表
+        </Link>
+        <div className="quiz-title-row">
+          <span className="quiz-title-icon">
+            <AppIcon name="document" size={28} accent="#EFD46D" />
+          </span>
+          <div>
+            <small>KNOWLEDGE ASSESSMENT</small>
+            <h1>知识点测评：<span className="kp-title">{knowledgePoint.title}</span></h1>
+          </div>
+        </div>
       </div>
       
       {/* 设置区域 */}
@@ -260,7 +272,7 @@ function QuizPage() {
         <div className="quiz-settings">
           {/* 题型切换 */}
           <div className="setting-group">
-            <label className="setting-label">📋 题型选择</label>
+            <label className="setting-label"> 题型选择</label>
             <div className="type-toggle">
               <button 
                 onClick={() => setQuestionType('single-choice')}
@@ -281,7 +293,7 @@ function QuizPage() {
           
           {/* 题目数量 */}
           <div className="setting-group">
-            <label className="setting-label">🔢 题目数量</label>
+            <label className="setting-label"> 题目数量</label>
             <div className="count-input">
               <input 
                 type="number" 
@@ -297,7 +309,7 @@ function QuizPage() {
           
           {/* 难度选择 */}
           <div className="setting-group">
-            <label className="setting-label">🎯 选择难度开始测评</label>
+            <label className="setting-label"> 选择难度开始测评</label>
             <div className="difficulty-btns">
               {['基础', '中等', '困难'].map(diff => (
                 <button 
@@ -317,7 +329,7 @@ function QuizPage() {
       {/* 加载状态 */}
       {isLoading && (
         <div className="quiz-loading">
-          <p>🤖 AI正在生成 {questionCount} 道题目...</p>
+          <p> AI正在生成 {questionCount} 道题目...</p>
           <p>请稍候，预计需要 {questionCount * 6} 秒</p>
         </div>
       )}
@@ -422,7 +434,7 @@ function QuizPage() {
       {/* 所有题目完成后的统计结果 */}
       {isFinished && (
         <div className="result-card">
-          <h2 className="result-title">🎉 测评完成！</h2>
+          <h2 className="result-title"> 测评完成！</h2>
           
           <div className="stats-grid">
             <div className="stat-box">
@@ -487,7 +499,7 @@ function QuizPage() {
                       background: results[idx].isCorrect ? '#d1fae5' : '#fee2e2',
                       color: results[idx].isCorrect ? '#065f46' : '#991b1b'
                     }}>
-                      {results[idx].isCorrect ? '✅ 正确' : '❌ 错误'}
+                      {results[idx].isCorrect ? ' 正确' : ' 错误'}
                     </span>
                   </div>
                   
@@ -511,7 +523,7 @@ function QuizPage() {
                               border: '1px solid #10b981'
                             }}>
                               <p style={{ fontWeight: 'bold', marginBottom: '8px', color: '#065f46', fontSize: '0.95rem' }}>
-                                ✅ 为什么正确
+                                 为什么正确
                               </p>
                               <p style={{ color: '#064e3b', lineHeight: '1.7', margin: 0 }}>{results[idx].correctExplanation}</p>
                             </div>
@@ -530,7 +542,7 @@ function QuizPage() {
                                 color: results[idx].isCorrect ? '#6b7280' : '#991b1b', 
                                 fontSize: '0.95rem' 
                               }}>
-                                {results[idx].isCorrect ? '💡 其他选项分析' : '❌ 错误原因'}
+                                {results[idx].isCorrect ? ' 其他选项分析' : ' 错误原因'}
                               </p>
                               <p style={{ 
                                 color: results[idx].isCorrect ? '#374151' : '#7f1d1d', 
@@ -548,7 +560,7 @@ function QuizPage() {
                               border: '1px solid #60a5fa'
                             }}>
                               <p style={{ fontWeight: 'bold', marginBottom: '8px', color: '#1e40af', fontSize: '0.95rem' }}>
-                                📚 知识点总结
+                                 知识点总结
                               </p>
                               <p style={{ color: '#1e3a8a', lineHeight: '1.7', margin: 0 }}>{results[idx].knowledgePoints}</p>
                             </div>
@@ -586,7 +598,7 @@ function QuizPage() {
                               border: '1px solid #e5e7eb'
                             }}>
                               <p style={{ fontWeight: 'bold', marginBottom: '8px', color: '#1f2937', fontSize: '0.95rem' }}>
-                                🔍 答案分析
+                                 答案分析
                               </p>
                               <p style={{ color: '#374151', lineHeight: '1.7', margin: 0 }}>{results[idx].analysis}</p>
                             </div>
@@ -600,7 +612,7 @@ function QuizPage() {
                               border: '1px solid #fbbf24'
                             }}>
                               <p style={{ fontWeight: 'bold', marginBottom: '8px', color: '#92400e', fontSize: '0.95rem' }}>
-                                💡 改进建议
+                                 改进建议
                               </p>
                               <p style={{ color: '#78350f', lineHeight: '1.7', margin: 0 }}>{results[idx].suggestions}</p>
                             </div>
@@ -614,7 +626,7 @@ function QuizPage() {
                               border: '1px solid #60a5fa'
                             }}>
                               <p style={{ fontWeight: 'bold', marginBottom: '8px', color: '#1e40af', fontSize: '0.95rem' }}>
-                                📚 标准答案
+                                 标准答案
                               </p>
                               <p style={{ color: '#1e3a8a', lineHeight: '1.7', margin: 0 }}>{results[idx].standardAnswer}</p>
                             </div>
@@ -630,7 +642,7 @@ function QuizPage() {
           
           {results.some(r => !r.isCorrect) && (
             <div className="review-notice">
-              ⚠️ 检测到错题，该知识点已加入你的复习列表
+               检测到错题，该知识点已加入你的复习列表
             </div>
           )}
           

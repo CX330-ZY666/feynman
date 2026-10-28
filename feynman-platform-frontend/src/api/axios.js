@@ -1,102 +1,79 @@
-// src/api/axios.js
 import axios from 'axios';
 
-const apiBaseURL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:3000/api');
+export const apiBaseURL = import.meta.env.VITE_API_URL
+    || (import.meta.env.PROD ? '/api' : 'http://localhost:8080/api');
 
 const apiClient = axios.create({
     baseURL: apiBaseURL,
-    timeout: 25000,
-    headers: {
-        'Content-Type': 'application/json',
-    },
+    timeout: 65000,
+    headers: { 'Content-Type': 'application/json' },
 });
 
-// 添加一个请求拦截器：仅附带 Authorization: Bearer <token>
-apiClient.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem('token'); // 从localStorage获取token
-        if (token) {
-            config.headers['Authorization'] = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
+apiClient.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    return config;
+});
 
-let isRefreshing = false;
 let refreshPromise = null;
 
-// 统一处理 401：支持 TOKEN_EXPIRED 自动刷新并重试一次
+const clearSession = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+};
+
 apiClient.interceptors.response.use(
-    (res) => res,
-    (error) => {
-        // Render 免费实例或边缘网络偶发断连时，GET 请求自动重试一次
-        const isNetworkError = !error.response;
-        const method = error?.config?.method?.toLowerCase();
+    (response) => {
+        const refreshToken = response?.data?.refreshToken;
+        const path = response?.config?.url || '';
+        if (refreshToken && (path.includes('/users/login') || path.includes('/users/register'))) {
+            localStorage.setItem('refreshToken', refreshToken);
+        }
+        return response;
+    },
+    async (error) => {
         const originalRequest = error.config || {};
-        if (isNetworkError && method === 'get' && !originalRequest._networkRetried) {
+        const method = originalRequest.method?.toLowerCase();
+
+        if (!error.response && method === 'get' && !originalRequest._networkRetried) {
             originalRequest._networkRetried = true;
-            return new Promise((resolve) => {
-                setTimeout(() => resolve(apiClient(originalRequest)), 800);
-            });
+            await new Promise((resolve) => setTimeout(resolve, 800));
+            return apiClient(originalRequest);
         }
 
-        const status = error?.response?.status;
-        const errCode = error?.response?.data?.error || error?.response?.data?.code;
-        
-
-        if (status === 401 && errCode === 'TOKEN_EXPIRED' && !originalRequest._retry) {
+        const isAuthRequest = String(originalRequest.url || '').includes('/users/');
+        const refreshToken = localStorage.getItem('refreshToken');
+        if (error.response?.status === 401 && !isAuthRequest && !originalRequest._retry && refreshToken) {
             originalRequest._retry = true;
-            if (!isRefreshing) {
-                isRefreshing = true;
-                refreshPromise = apiClient.post('/users/refresh')
-                    .then((resp) => {
-                        const newToken = resp?.data?.token;
-                        if (newToken) {
-                            localStorage.setItem('token', newToken);
-                            return newToken;
-                        }
-                        throw new Error('No token in refresh response');
+            if (!refreshPromise) {
+                refreshPromise = axios.post(`${apiBaseURL}/users/refresh`, { refreshToken })
+                    .then((response) => {
+                        const newToken = response?.data?.token;
+                        if (!newToken) throw new Error('刷新响应中没有访问令牌');
+                        localStorage.setItem('token', newToken);
+                        return newToken;
                     })
-                    .finally(() => {
-                        isRefreshing = false;
-                    });
+                    .finally(() => { refreshPromise = null; });
             }
-            return refreshPromise.then((newToken) => {
-                originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
-                return apiClient(originalRequest);
-            }).catch(() => {
-                // 刷新失败则清理并跳登录
-                try {
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('user');
-                } catch (err) {
-                    console.warn('清理localStorage失败:', err);
-                }
-                if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
-                    window.location.href = '/login';
-                }
-                return Promise.reject(error);
-            });
-        }
-
-        if (status === 401) {
             try {
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-            } catch (err) {
-                console.warn('清理localStorage失败:', err);
-            }
-            if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
-                window.location.href = '/login';
+                const newToken = await refreshPromise;
+                originalRequest.headers = originalRequest.headers || {};
+                originalRequest.headers.Authorization = `Bearer ${newToken}`;
+                return apiClient(originalRequest);
+            } catch (refreshError) {
+                clearSession();
+                if (!window.location.pathname.startsWith('/login')) window.location.href = '/login';
+                return Promise.reject(refreshError);
             }
         }
 
+        if (error.response?.status === 401) {
+            clearSession();
+            if (!window.location.pathname.startsWith('/login')) window.location.href = '/login';
+        }
         return Promise.reject(error);
     }
 );
 
 export default apiClient;
-

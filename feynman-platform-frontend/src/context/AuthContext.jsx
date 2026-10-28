@@ -5,10 +5,9 @@ import apiClient from '../api/axios';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-    const [token, setToken] = useState(localStorage.getItem('token')); // 1. 从localStorage初始化token
+    const [token, setToken] = useState(localStorage.getItem('token')); // 当前访问令牌
     const [user, setUser] = useState(() => {
-        const cached = localStorage.getItem('user');
-        return cached ? JSON.parse(cached) : null;
+        return null;
     }); // 当前登录用户信息
 
     // 简单的JWT解码工具（不校验签名，仅提取payload）
@@ -25,6 +24,7 @@ export function AuthProvider({ children }) {
     };
 
     useEffect(() => {
+        let cancelled = false;
         if (token) {
             localStorage.setItem('token', token);
             // 若没有user，尝试从token中解析
@@ -32,7 +32,7 @@ export function AuthProvider({ children }) {
                 const payload = decodeJwtPayload(token);
                 if (payload) {
                     const derived = {
-                        username: payload.username || payload.name || payload.sub || null,
+                        username: payload.username || payload.name || null,
                         email: payload.email || null,
                         userId: payload.userId || payload.uid || (payload.user && payload.user.id) || null,
                     };
@@ -42,14 +42,14 @@ export function AuthProvider({ children }) {
                 }
             }
             // 若仍没有email/username，尝试请求后端获取当前用户资料
-            if (!user || (!user.email && !user.username)) {
+            {
                 (async () => {
                     try {
                         const res = await apiClient.get('/users/me', {
                             headers: { Authorization: `Bearer ${token}` },
                         });
                         const u = res.data?.user || res.data || null;
-                        if (u) {
+                        if (u && !cancelled) {
                             setUser({
                                 username: u.username || u.name || null,
                                 email: u.email || null,
@@ -64,6 +64,7 @@ export function AuthProvider({ children }) {
         } else {
             localStorage.removeItem('token');
         }
+        return () => { cancelled = true; };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [token]);
 
@@ -76,7 +77,8 @@ export function AuthProvider({ children }) {
     }, [user]);
 
     const login = (newToken, newUser) => {
-        console.log('AuthContext: 正在保存token:', newToken);
+        localStorage.setItem('token', newToken);
+        setUser(null);
         setToken(newToken);
         if (newUser) {
             setUser(newUser);
@@ -84,7 +86,7 @@ export function AuthProvider({ children }) {
             const payload = decodeJwtPayload(newToken);
             if (payload) {
                 const derived = {
-                    username: payload.username || payload.name || payload.sub || null,
+                    username: payload.username || payload.name || null,
                     email: payload.email || null,
                     userId: payload.userId || payload.uid || (payload.user && payload.user.id) || null,
                 };
@@ -93,16 +95,16 @@ export function AuthProvider({ children }) {
                 }
             }
         }
-        console.log('AuthContext: token与用户已保存到state');
     };
 
     const logout = () => {
+        ['token', 'refreshToken', 'user'].forEach((key) => localStorage.removeItem(key));
         setToken(null);
         setUser(null);
     };
 
     // 2. 将 state 和函数通过 value prop 提供出去
-    const value = { token, user, login, logout };
+    const value = { token, user, login, logout, updateUser: setUser };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

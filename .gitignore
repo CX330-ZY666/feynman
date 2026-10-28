@@ -30,3 +30,22 @@ out/
 # Temporary files
 *.tmp
 .temp/
+
+# Local data, secrets, archives and deployment runtime
+.env.*
+!.env.example
+!.env.production
+*.pem
+*.key
+*.pfx
+*.p12
+*.zip
+**/uploads/
+**/vector_store/
+**/target/
+**/logs/
+**/models/multilingual-e5-small/
+.codex-ppt-scratch/
+第13组/
+deploy-local/
+actions-runner/

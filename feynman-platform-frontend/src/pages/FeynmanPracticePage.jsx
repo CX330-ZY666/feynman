@@ -44,7 +44,7 @@ function FeynmanPracticePage() {
         // 添加AI的欢迎消息
         setConversations([{
           role: 'ai',
-          content: `你好！我是小问 👋 我听说你想给我讲讲「${response.data.title}」？我完全不懂这个，请用最简单的话给我解释一下吧！`,
+          content: `你好！我是小问  我听说你想给我讲讲「${response.data.title}」？我完全不懂这个，请用最简单的话给我解释一下吧！`,
           timestamp: new Date()
         }]);
       } catch (err) {
@@ -99,7 +99,7 @@ function FeynmanPracticePage() {
 
       // 检查是否应该智能结束
       if (response.data.shouldContinue === false) {
-        console.log('🎉 AI判断用户已经讲清楚了，准备自动结束练习');
+        console.log(' AI判断用户已经讲清楚了，准备自动结束练习');
         console.log('原因:', response.data.reason);
 
         // 延迟3秒后自动显示总结
@@ -249,10 +249,10 @@ function FeynmanPracticePage() {
     <div className="feynman-practice-container">
       {/* 页面头部 */}
       <div className="practice-header">
-        <h1>🎓 费曼练习</h1>
+        <h1> 费曼练习</h1>
         <div style={{ display: 'flex', gap: '10px' }}>
           <button className="end-practice-btn" onClick={handleEndPractice}>
-            📊 结束练习
+             结束练习
           </button>
           <Link to="/" className="back-btn">← 返回主页</Link>
         </div>
@@ -260,7 +260,7 @@ function FeynmanPracticePage() {
 
       {/* 知识点信息 */}
       <div className="kp-info-card">
-        <h2>📖 {knowledgePoint.title}</h2>
+        <h2> {knowledgePoint.title}</h2>
         <p>用自己的话向AI学生"小问"讲解这个概念，看看能不能讲清楚！</p>
       </div>
 
@@ -269,7 +269,7 @@ function FeynmanPracticePage() {
         {/* 左侧：讲解输入区 */}
         <div className="practice-panel">
           <div className="panel-title">
-            <span>📝</span> 你的讲解
+            <span></span> 你的讲解
           </div>
 
           <div className="explanation-input">
@@ -285,7 +285,7 @@ function FeynmanPracticePage() {
                 className={`mode-btn ${inputMode === 'voice' ? 'active' : ''}`}
                 onClick={() => setInputMode('voice')}
               >
-                🎤 语音输入
+                 语音输入
               </button>
             </div>
 
@@ -328,7 +328,7 @@ function FeynmanPracticePage() {
                       width: '100%'
                     }}
                   >
-                    ✔️ 将转写结果添加到输入框
+                     将转写结果添加到输入框
                   </button>
                 )}
               </div>
@@ -340,7 +340,7 @@ function FeynmanPracticePage() {
               onClick={handleSendExplanation}
               disabled={!userInput.trim() || isAiThinking}
             >
-              {isAiThinking ? '🤔 小问正在思考...' : '📤 发送讲解 (Ctrl+Enter)'}
+              {isAiThinking ? ' 小问正在思考...' : ' 发送讲解 (Ctrl+Enter)'}
             </button>
 
             {aiError && <div className="error-message">{aiError}</div>}
@@ -350,14 +350,14 @@ function FeynmanPracticePage() {
         {/* 右侧：AI对话区 */}
         <div className="practice-panel">
           <div className="panel-title">
-            <span>🤖</span> AI学生"小问"
+            <span></span> AI学生"小问"
           </div>
 
           <div className="conversation-area">
             <div className="messages-list">
               {conversations.length === 0 ? (
                 <div className="welcome-message">
-                  <div className="emoji">👋</div>
+                  <div className="emoji"></div>
                   <h3>准备好了吗？</h3>
                   <p>在左侧输入你的讲解，小问会认真听并提出问题~</p>
                 </div>
@@ -365,7 +365,7 @@ function FeynmanPracticePage() {
                 conversations.map((msg, index) => (
                   <div key={index} className={`message ${msg.role}`}>
                     <div className="message-sender">
-                      {msg.role === 'user' ? '👤 你' : '🤖 小问'}
+                      {msg.role === 'user' ? ' 你' : ' 小问'}
                     </div>
                     <div className="message-content">{msg.content}</div>
                   </div>
@@ -374,7 +374,7 @@ function FeynmanPracticePage() {
 
               {isAiThinking && (
                 <div className="ai-typing">
-                  <span>🤖 小问正在思考</span>
+                  <span> 小问正在思考</span>
                   <div className="typing-dots">
                     <span></span>
                     <span></span>
@@ -400,7 +400,7 @@ function FeynmanPracticePage() {
       {(weakPoints.length > 0 || showWeakPointInput) && (
         <div className="weak-points-section">
           <div className="weak-points-header">
-            <h3>💡 薄弱点记录</h3>
+            <h3> 薄弱点记录</h3>
             {!showWeakPointInput && (
               <button 
                 className="weak-point-btn"
@@ -451,7 +451,7 @@ function FeynmanPracticePage() {
                 key={index} 
                 className={`weak-point-item ${wp.resolved ? 'resolved' : ''}`}
               >
-                <span>{wp.resolved ? '✅' : '❓'}</span>
+                <span>{wp.resolved ? '' : '❓'}</span>
                 <span className="weak-point-content">{wp.content}</span>
                 <div className="weak-point-actions">
                   <button 
@@ -471,7 +471,7 @@ function FeynmanPracticePage() {
       {showSummary && summary && (
         <div className="summary-modal-overlay" onClick={() => setShowSummary(false)}>
           <div className="summary-modal" onClick={(e) => e.stopPropagation()}>
-            <h2>🎉 练习完成！</h2>
+            <h2> 练习完成！</h2>
 
             {/* 理解度评分（如果有） */}
             {summary.understandingScore !== undefined && (
@@ -483,7 +483,7 @@ function FeynmanPracticePage() {
                 marginBottom: '20px'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <h3 style={{ margin: 0, color: '#10b981' }}>📊 理解度评分</h3>
+                  <h3 style={{ margin: 0, color: '#10b981' }}> 理解度评分</h3>
                   <div style={{
                     fontSize: '32px',
                     fontWeight: 'bold',
@@ -502,7 +502,7 @@ function FeynmanPracticePage() {
                     color: '#fbbf24',
                     fontSize: '14px'
                   }}>
-                    ⚠️ 检测到可能只是复述原文，建议用自己的话重新表达
+                     检测到可能只是复述原文，建议用自己的话重新表达
                   </div>
                 )}
                 {summary.feedback && (
@@ -542,7 +542,7 @@ function FeynmanPracticePage() {
                     borderRadius: '8px',
                     padding: '15px'
                   }}>
-                    <h4 style={{ color: '#10b981', margin: '0 0 10px 0', fontSize: '14px' }}>✅ 做得好的地方</h4>
+                    <h4 style={{ color: '#10b981', margin: '0 0 10px 0', fontSize: '14px' }}> 做得好的地方</h4>
                     <ul style={{ margin: 0, paddingLeft: '20px', color: '#ccc', fontSize: '13px' }}>
                       {summary.strengths.map((s, i) => (
                         <li key={i} style={{ marginBottom: '5px' }}>{s}</li>
@@ -557,7 +557,7 @@ function FeynmanPracticePage() {
                     borderRadius: '8px',
                     padding: '15px'
                   }}>
-                    <h4 style={{ color: '#fbbf24', margin: '0 0 10px 0', fontSize: '14px' }}>📝 可以改进的地方</h4>
+                    <h4 style={{ color: '#fbbf24', margin: '0 0 10px 0', fontSize: '14px' }}> 可以改进的地方</h4>
                     <ul style={{ margin: 0, paddingLeft: '20px', color: '#ccc', fontSize: '13px' }}>
                       {summary.weaknesses.map((w, i) => (
                         <li key={i} style={{ marginBottom: '5px' }}>{w}</li>
@@ -570,7 +570,7 @@ function FeynmanPracticePage() {
 
             {summary.suggestions && summary.suggestions.length > 0 && (
               <div className="summary-suggestions">
-                <h4>💡 学习建议</h4>
+                <h4> 学习建议</h4>
                 <ul>
                   {summary.suggestions.map((s, i) => (
                     <li key={i}>{s}</li>

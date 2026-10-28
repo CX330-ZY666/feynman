@@ -3,8 +3,9 @@ import { Routes, Route } from 'react-router-dom';
 import './styles/animations.css'; // 全局动画样式
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import AccountPage from './pages/AccountPage';
 import DashboardPage from './pages/DashboardPage';
-import Layout from './components/Layout';
+import Layout from './components/AppShell';
 import ProtectedRoute from './components/ProtectedRoute';
 import KnowledgePointFormPage from './pages/KnowledgePointFormPage';
 import FeynmanRecordPage from './pages/FeynmanRecordPage';
@@ -28,6 +29,7 @@ function App() {
         {/* 受保护的路由 */}
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<DashboardPage />} />
+          <Route path="/account" element={<AccountPage />} />
           <Route path="/browse" element={<KnowledgePointBrowser />} />
           <Route path="/kp/new" element={<KnowledgePointFormPage />} />
           <Route path="/kp/edit/:id" element={<KnowledgePointFormPage />} />

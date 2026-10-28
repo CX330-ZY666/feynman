@@ -61,7 +61,7 @@ function RichTextEditor({ value, onChange, placeholder = '开始输入内容...'
         background: '#f9fafb',
         borderBottom: '1px solid #e5e7eb'
       }}>
-        💡 <strong>快捷键：</strong> 
+         <strong>快捷键：</strong> 
         输入 <code># 空格</code> 创建标题，
         <code>**文字**</code> 加粗，
         <code>- 空格</code> 列表
@@ -156,7 +156,7 @@ function RichTextEditor({ value, onChange, placeholder = '开始输入内容...'
           onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3 }).run()}
           title="插入表格"
         >
-          📊 表格
+           表格
         </button>
       </div>
       <EditorContent editor={editor} />

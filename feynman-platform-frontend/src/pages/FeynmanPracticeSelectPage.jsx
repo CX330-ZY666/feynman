@@ -83,7 +83,7 @@ function FeynmanPracticeSelectPage() {
       {/* 页面头部 */}
       <div className="select-header">
         <div className="header-content">
-          <h1>🎓 费曼练习</h1>
+          <h1> 费曼练习</h1>
           <p className="header-desc">
             选择一个知识点，通过"教"的方式检验你的理解程度。AI学生「小问」会认真听你讲解并提出问题。
           </p>
@@ -93,7 +93,7 @@ function FeynmanPracticeSelectPage() {
       {/* 搜索和筛选 */}
       <div className="filter-bar">
         <div className="search-box">
-          <span className="search-icon">🔍</span>
+          <span className="search-icon"></span>
           <input
             type="text"
             placeholder="搜索知识点..."
@@ -132,7 +132,7 @@ function FeynmanPracticeSelectPage() {
       {/* 知识点列表 */}
       {filteredKPs.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-icon">📚</div>
+          <div className="empty-icon"></div>
           <h3>没有找到知识点</h3>
           <p>
             {knowledgePoints.length === 0 
@@ -141,7 +141,7 @@ function FeynmanPracticeSelectPage() {
           </p>
           {knowledgePoints.length === 0 && (
             <button className="create-btn" onClick={() => navigate('/kp/new')}>
-              ✨ 创建知识点
+               创建知识点
             </button>
           )}
         </div>
@@ -167,7 +167,7 @@ function FeynmanPracticeSelectPage() {
               </p>
               <div className="kp-card-footer">
                 <span className={`kp-status ${kp.status === 'mastered' ? 'status-mastered' : kp.reviewList ? 'status-reviewing' : 'status-learning'}`}>
-                  {kp.status === 'mastered' ? '✅ 已掌握' : kp.reviewList ? '⚠️ 需复习' : '📖 学习中'}
+                  {kp.status === 'mastered' ? ' 已掌握' : kp.reviewList ? ' 需复习' : ' 学习中'}
                 </span>
                 <button className="start-practice-btn">
                   开始练习 →
@@ -180,7 +180,7 @@ function FeynmanPracticeSelectPage() {
 
       {/* 使用说明 */}
       <div className="tips-section">
-        <h3>💡 什么是费曼学习法？</h3>
+        <h3> 什么是费曼学习法？</h3>
         <div className="tips-content">
           <div className="tip-item">
             <span className="tip-number">1</span>

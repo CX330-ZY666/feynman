@@ -81,7 +81,7 @@ function TagSelector({ selectedTags = [], onChange }) {
 
   return (
     <div className="tag-selector">
-      <div className="tag-selector-label">🏷️ 选择标签（可多选）</div>
+      <div className="tag-selector-label"> 选择标签（可多选）</div>
       
       {/* 预设标签 */}
       <div className="preset-tags">
@@ -106,7 +106,7 @@ function TagSelector({ selectedTags = [], onChange }) {
       {/* 自定义标签区域 */}
       {customTagsList.length > 0 && (
         <div className="custom-tags-section">
-          <div className="custom-tags-label">✨ 我的自定义标签</div>
+          <div className="custom-tags-label"> 我的自定义标签</div>
           <div className="preset-tags">
             {customTagsList.map(tag => (
               <div key={tag.name} className="custom-tag-wrapper">

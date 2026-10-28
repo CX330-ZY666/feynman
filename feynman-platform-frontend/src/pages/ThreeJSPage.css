@@ -3,7 +3,7 @@
     margin: -1rem;
     margin-top: 0; /* 保持和导航栏之间的间距由 nav 自己控制 */
     height: calc(100vh - 70px); /* 视口高度减去导航栏高度（与 Layout.css 中保持一致） */
-    width: 100vw;
+    width: 100%;
     overflow: hidden;
     position: relative;
 }
@@ -44,4 +44,78 @@
 
 .toggle-edges-btn:active {
     transform: translateY(0);
+}
+
+/* 画布顶部统一搜索栏 */
+.threejs-search-area {
+    position: absolute;
+    top: 18px;
+    left: 50%;
+    z-index: 100;
+    width: min(620px, calc(100% - 280px));
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.threejs-search-box {
+    min-height: 54px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 16px;
+    background: #fffefa;
+    border: 2px solid #303330;
+    border-radius: 14px;
+    box-shadow: 0 4px 0 #303330;
+    pointer-events: auto;
+}
+
+.threejs-search-input {
+    flex: 1;
+    min-width: 0;
+    height: 48px;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: none;
+    color: #303330 !important;
+    font-size: 16px;
+}
+
+.threejs-search-input:focus {
+    box-shadow: none !important;
+}
+
+.threejs-search-clear {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    border: 2px solid #303330;
+    border-radius: 9px;
+    background: #efc3ca;
+    cursor: pointer;
+}
+
+.threejs-search-area > div:not(.threejs-search-box) {
+    pointer-events: auto;
+}
+
+@media (max-width: 900px) {
+    .threejs-search-area {
+        top: 12px;
+        width: calc(100% - 116px);
+        left: 16px;
+        transform: none;
+    }
+    .threejs-search-box { min-height: 48px; }
+    .threejs-search-input { height: 42px; font-size: 14px; }
 }

@@ -601,3 +601,30 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* 2026 unified Feynman conversation UI */
+.feynman-practice-container{min-height:100%;padding:0 0 36px;background:transparent;color:#303330}
+.feynman-practice-container .practice-header,.feynman-practice-container .kp-info-card,.feynman-practice-container .practice-main,.feynman-practice-container .weak-points-section{max-width:1400px}
+.feynman-practice-container .practice-header{margin-bottom:18px;padding:18px 20px;background:#fffefa;border:3px solid #303330;border-radius:20px;box-shadow:0 5px 0 #303330}
+.feynman-practice-container .practice-header h1{color:#303330;font-size:28px}.feynman-practice-container .back-btn,.feynman-practice-container .end-practice-btn{padding:10px 15px;background:#fffefa;color:#303330;border:2px solid #303330;border-radius:10px;box-shadow:0 3px 0 #303330;font-weight:700}
+.feynman-practice-container .end-practice-btn{background:#efc3ca}
+.feynman-practice-container .kp-info-card{margin-bottom:18px;padding:18px 20px;background:#efd46d;border:3px solid #303330;border-radius:16px;box-shadow:0 4px 0 #303330}
+.feynman-practice-container .kp-info-card h2{color:#303330;font-size:21px}.feynman-practice-container .kp-info-card p{color:#555952}
+.feynman-practice-container .practice-main{grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:18px;align-items:stretch}
+.feynman-practice-container .practice-panel{min-height:560px;padding:20px;background:#fffefa;border:3px solid #303330;border-radius:18px;box-shadow:0 5px 0 #303330}
+.feynman-practice-container .panel-title{color:#303330;border-bottom:2px solid #303330;font-size:17px}
+.feynman-practice-container .mode-btn{padding:11px;background:#fffefa;color:#303330;border:2px solid #303330;border-radius:10px;box-shadow:0 2px 0 #303330;font-weight:700}
+.feynman-practice-container .mode-btn.active{background:#a9bed3;color:#303330;border-color:#303330}
+.feynman-practice-container .text-input-area textarea{min-height:260px;padding:16px;background:#f8f6f1;color:#303330;border:2px solid #303330;border-radius:12px;line-height:1.7}
+.feynman-practice-container .send-btn{min-height:50px;background:#efd46d;color:#303330;border:2px solid #303330;border-radius:11px;box-shadow:0 4px 0 #303330;font-weight:800}
+.feynman-practice-container .send-btn:disabled{background:#deddd7;color:#858983;border-color:#858983;box-shadow:0 3px 0 #858983}
+.feynman-practice-container .conversation-area{min-height:480px}.feynman-practice-container .messages-list{padding:4px 8px 8px 2px}
+.feynman-practice-container .message{padding:13px 15px;color:#303330;border:2px solid #303330;border-radius:14px;box-shadow:0 3px 0 #303330}
+.feynman-practice-container .message.user{background:#efd46d;color:#303330;border-bottom-right-radius:5px}.feynman-practice-container .message.ai{background:#e5eef2;color:#303330;border-bottom-left-radius:5px}
+.feynman-practice-container .message-sender{opacity:1;color:#686d67;font-weight:700}.feynman-practice-container .ai-typing{color:#686d67}.feynman-practice-container .typing-dots span{background:#e99aa8}
+.feynman-practice-container .mark-weak-btn{padding:10px 12px;background:#f4e7ad;color:#303330;border:2px solid #303330;border-radius:10px;box-shadow:0 3px 0 #303330;font-weight:700}
+.feynman-practice-container .voice-input-area{background:#f8f6f1;border:2px solid #303330;border-radius:12px}.feynman-practice-container .voice-input-area>div{background:#fffefa!important;border-color:#303330!important}
+.feynman-practice-container .weak-points-section{background:#f4e7ad;border:3px solid #303330;border-radius:16px;box-shadow:0 4px 0 #303330}.feynman-practice-container .weak-points-header h3{color:#303330}.feynman-practice-container .weak-point-item{background:#fffefa;border:2px solid #303330}.feynman-practice-container .weak-point-btn{background:#fffefa;color:#303330;border:2px solid #303330;border-radius:8px}.feynman-practice-container .weak-point-btn.resolve{background:#bcd4bf;color:#303330;border-color:#303330}
+.feynman-practice-container .summary-modal-overlay{background:rgba(48,51,48,.58);backdrop-filter:blur(3px)}.feynman-practice-container .summary-modal{max-width:720px;max-height:88vh;overflow:auto;background:#fffefa;color:#303330;border:3px solid #303330;border-radius:20px;box-shadow:0 7px 0 #303330}.feynman-practice-container .summary-modal h2,.feynman-practice-container .summary-suggestions h4,.feynman-practice-container .stat-value{color:#303330}.feynman-practice-container .close-summary-btn{background:#efd46d;color:#303330;border:2px solid #303330;border-radius:10px;box-shadow:0 3px 0 #303330}
+@media(max-width:980px){.feynman-practice-container .practice-main{grid-template-columns:1fr}.feynman-practice-container .practice-panel{min-height:auto}}
+@media(max-width:700px){.feynman-practice-container .practice-header{align-items:flex-start}.feynman-practice-container .practice-main{gap:14px}.feynman-practice-container .summary-stats{gap:14px}}

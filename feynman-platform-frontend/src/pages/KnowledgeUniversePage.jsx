@@ -4,16 +4,17 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import * as d3 from 'd3-force-3d';
 import DOMPurify from 'dompurify';
 import apiClient from '../api/axios';
+import AppIcon from '../components/ui/AppIconFixed.jsx';
 
 // 关系类型配置（与 RelationshipManager 保持一致）
 const RELATION_TYPES = {
     'prerequisite': { label: '前置知识', color: 0xff4444, icon: '⬅️' },
-    'derived': { label: '派生', color: 0x44ff44, icon: '🌿' },
-    'similar': { label: '相似', color: 0x4444ff, icon: '🔄' },
+    'derived': { label: '派生', color: 0x44ff44, icon: '' },
+    'similar': { label: '相似', color: 0x4444ff, icon: '' },
     'contrast': { label: '对比', color: 0xffaa00, icon: '⚖️' },
-    'application': { label: '应用', color: 0xff44ff, icon: '🎯' },
-    'includes': { label: '包含', color: 0x44ffff, icon: '📦' },
-    'reference': { label: '引用', color: 0xaaaaaa, icon: '🔗' }
+    'application': { label: '应用', color: 0xff44ff, icon: '' },
+    'includes': { label: '包含', color: 0x44ffff, icon: '' },
+    'reference': { label: '引用', color: 0xaaaaaa, icon: '' }
 };
 
 // 可视化参数配置
@@ -362,7 +363,7 @@ function KnowledgeUniversePage() {
                 mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
             }
             
-            // 🎨 基于关系类型的颜色调色板（增强亮度）
+            //  基于关系类型的颜色调色板（增强亮度）
             const mainColor = new THREE.Color(baseColor);
             const palette = [
                 mainColor.clone().multiplyScalar(2.5),   // 超亮色
@@ -801,7 +802,7 @@ function KnowledgeUniversePage() {
             };
         });
 
-        // 💡 新：生成连接线数据（支持三种模式）
+        //  新：生成连接线数据（支持三种模式）
         const linkData = [];
         const addedLinks = new Map(); // key -> link metadata
         
@@ -963,7 +964,7 @@ function KnowledgeUniversePage() {
             planet.position.set(d.x, d.y, d.z);
         });
         
-        // 🔥 性能保护：节点数量过多时降低力导向更新频率
+        //  性能保护：节点数量过多时降低力导向更新频率
         const forceUpdateInterval = knowledgePoints.length > 50 ? 3 : 1; // >50个节点时每3帧更新一次
         let forceFrameCounter = 0;
         
@@ -1394,7 +1395,7 @@ function KnowledgeUniversePage() {
                     padding: '25px 45px',
                     ...UI_STYLES.glassCard
                 }}>
-                    🌌 正在构建知识宇宙...
+                     正在构建知识宇宙...
                 </div>
             </div>
         );
@@ -1420,11 +1421,11 @@ function KnowledgeUniversePage() {
     }
 
     return (
-        <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ width: '100%', height: 'calc(100vh - 48px)', position: 'relative', overflow: 'hidden' }}>
             <div ref={mountRef} style={{ width: '100%', height: '100%' }} />
             
             {/* 搜索框 */}
-            <div style={{
+            <div className="immersive-search-area" style={{
                 position: 'fixed',
                 top: '100px',
                 left: '50%',
@@ -1436,7 +1437,7 @@ function KnowledgeUniversePage() {
                 gap: '8px'
             }}>
                 {/* 搜索输入框 */}
-                <div style={{
+                <div className="immersive-search-box" style={{
                     background: 'rgba(10, 15, 30, 0.9)',
                     backdropFilter: 'blur(10px)',
                     borderRadius: '12px',
@@ -1447,12 +1448,13 @@ function KnowledgeUniversePage() {
                     gap: '10px',
                     width: '320px'
                 }}>
-                    <span style={{ fontSize: '16px', opacity: 0.6 }}>🔍</span>
+                    <AppIcon name="search" size={22} accent="#A9BED3" />
                     <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="搜索知识点、标签、分类..."
+                        className="immersive-search-input"
                         style={{
                             flex: 1,
                             background: 'transparent',
@@ -1465,6 +1467,7 @@ function KnowledgeUniversePage() {
                     {searchQuery && (
                         <button
                             onClick={() => setSearchQuery('')}
+                            className="immersive-search-clear"
                             style={{
                                 background: 'transparent',
                                 border: 'none',
@@ -1480,7 +1483,7 @@ function KnowledgeUniversePage() {
                             }}
                             title="清除搜索"
                         >
-                            ×
+                            <AppIcon name="close" size={18} accent="#E99AA8" />
                         </button>
                     )}
                 </div>
@@ -1563,7 +1566,7 @@ function KnowledgeUniversePage() {
                         marginBottom: '10px',
                         fontWeight: 'bold'
                     }}>
-                        🎯 关系显示模式
+                         关系显示模式
                     </div>
                     <div style={{ display: 'flex', gap: '10px', flexDirection: 'column' }}>
                         <button
@@ -1581,7 +1584,7 @@ function KnowledgeUniversePage() {
                             }}
                             title={`语义关系: 显示用户显式定义的关系 (${relations.length} 个)`}
                         >
-                            🌿 语义关系 ({relations.length})
+                             语义关系 ({relations.length})
                         </button>
                         <button
                             onClick={() => setDisplayMode('tags')}
@@ -1598,7 +1601,7 @@ function KnowledgeUniversePage() {
                             }}
                             title="标签推断: 基于共同标签自动生成连接"
                         >
-                            🏷️ 标签推断
+                             标签推断
                         </button>
                     </div>
                     <div style={{
@@ -1607,7 +1610,7 @@ function KnowledgeUniversePage() {
                         color: '#999',
                         lineHeight: '1.4'
                     }}>
-                        💡 当前: <strong style={{ color: '#00ccff' }}>
+                         当前: <strong style={{ color: '#00ccff' }}>
                             {displayMode === 'semantic' ? '语义关系模式' : '标签推断模式'}
                         </strong>
                         {displayMode === 'semantic' && <><br/>显示用户显式定义的知识关系</>}
@@ -1673,10 +1676,10 @@ function KnowledgeUniversePage() {
                         gap: '20px',
                         boxShadow: '0 5px 20px rgba(0,0,0,0.2)'
                     }}>
-                        <span>🖱️ 左键旋转</span>
-                        <span>🖱️ 右键平移</span>
-                        <span>🔍 滚轮缩放</span>
-                        <span>👆 点击星球</span>
+                        <span> 左键旋转</span>
+                        <span> 右键平移</span>
+                        <span> 滚轮缩放</span>
+                        <span> 点击星球</span>
                     </div>
                 </div>
             
@@ -1685,7 +1688,7 @@ function KnowledgeUniversePage() {
                 <div style={UI_STYLES.detailCard}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
                         <h3 style={{ margin: 0, fontSize: '22px', color: '#00ccff' }}>
-                            🪐 {selectedNodeData.title}
+                             {selectedNodeData.title}
                         </h3>
                         <button
                             onClick={() => {
@@ -1725,7 +1728,7 @@ function KnowledgeUniversePage() {
                             fontSize: '13px',
                             color: '#00ccff'
                         }}>
-                            📂 分类: {selectedNodeData.category}
+                             分类: {selectedNodeData.category}
                         </div>
                     )}
                 </div>

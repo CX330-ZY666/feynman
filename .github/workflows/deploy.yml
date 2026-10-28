@@ -1,0 +1,92 @@
+name: Build and deploy Feynman
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'feynman-platform-frontend/**'
+      - 'feynman-platform-springboot/**'
+      - '.github/workflows/deploy.yml'
+      - 'deploy/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: feynman-production
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: feynman-platform-frontend/package-lock.json
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: feynman-platform-springboot/pom.xml
+      - name: Build frontend
+        working-directory: feynman-platform-frontend
+        env:
+          VITE_API_URL: /api
+        run: |
+          npm ci
+          npm run build
+      - name: Test and package backend
+        working-directory: feynman-platform-springboot
+        run: mvn -B --no-transfer-progress package
+      - name: Create release archive
+        run: |
+          mkdir -p release
+          cp -R feynman-platform-frontend/dist release/dist
+          cp feynman-platform-springboot/target/feynman-platform-springboot-0.0.1-SNAPSHOT.jar release/backend.jar
+          printf '%s\n' "$GITHUB_SHA" > release/revision.txt
+          cd release
+          zip -qr ../feynman-release.zip .
+      - name: Save downloadable release
+        uses: actions/upload-artifact@v4
+        with:
+          name: feynman-release
+          path: feynman-release.zip
+          retention-days: 7
+      - name: Check deployment configuration
+        id: config
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          if [[ -n "$DEPLOY_HOST" && -n "$DEPLOY_USER" && -n "$DEPLOY_SSH_KEY" && -n "$DEPLOY_KNOWN_HOSTS" ]]; then
+            echo 'enabled=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'enabled=false' >> "$GITHUB_OUTPUT"
+            echo '::notice::Build succeeded. Configure the four DEPLOY_* secrets to enable server deployment.'
+          fi
+      - name: Upload and deploy over SSH
+        if: steps.config.outputs.enabled == 'true'
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/feynman_deploy
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/feynman_deploy ~/.ssh/known_hosts
+          trap 'rm -f ~/.ssh/feynman_deploy' EXIT
+          SSH_OPTS=(-i ~/.ssh/feynman_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=20)
+          scp "${SSH_OPTS[@]}" feynman-release.zip "${DEPLOY_USER}@${DEPLOY_HOST}:C:/apps/feynman/incoming/release-${GITHUB_SHA}.zip"
+          ssh "${SSH_OPTS[@]}" "${DEPLOY_USER}@${DEPLOY_HOST}" "powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:/apps/feynman/deploy-release.ps1 -ReleaseArchive C:/apps/feynman/incoming/release-${GITHUB_SHA}.zip"

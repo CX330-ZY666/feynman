@@ -131,11 +131,11 @@ function LocalVoiceRecorder({ onTranscribeComplete }) {
 
   return (
     <div style={{ border: '1px solid #ddd', padding: '1rem', borderRadius: '6px', background: '#f9f9f9' }}>
-      <h3>🎙️ 语音输入</h3>
+      <h3> 语音输入</h3>
 
       {error && (
         <div style={{ padding: '8px', marginBottom: '12px', background: '#fee', border: '1px solid #fcc', borderRadius: '4px', color: '#c33' }}>
-          ⚠️ {error}
+           {error}
         </div>
       )}
 
@@ -153,7 +153,7 @@ function LocalVoiceRecorder({ onTranscribeComplete }) {
             cursor: isListening ? 'not-allowed' : 'pointer',
           }}
         >
-          {isListening ? '🔴 正在收听...' : '🎙️ 开始说话'}
+          {isListening ? ' 正在收听...' : ' 开始说话'}
         </button>
         <button
           type="button"
@@ -222,12 +222,12 @@ function LocalVoiceRecorder({ onTranscribeComplete }) {
             cursor: 'pointer',
           }}
         >
-          🗑️ 清空
+           清空
         </button>
       </div>
 
       <p style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem' }}>
-        💡 提示：点击"开始说话"后，请说出你要输入的内容。支持中文语音识别。
+         提示：点击"开始说话"后，请说出你要输入的内容。支持中文语音识别。
       </p>
     </div>
   );

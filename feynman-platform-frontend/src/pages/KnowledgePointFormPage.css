@@ -217,3 +217,11 @@
 .back-link:hover {
   color: white;
 }
+
+/* 2026 unified knowledge form header */
+.kp-form-header{position:relative;padding:22px 24px 24px;background:#fffefa;border:3px solid #303330;border-radius:20px;box-shadow:0 5px 0 #303330;color:#303330}
+.kp-form-header .back-link{display:inline-flex;align-items:center;gap:6px;margin-bottom:20px;padding:7px 11px;background:#e5eef2;color:#303330;border:2px solid #303330;border-radius:9px;box-shadow:0 2px 0 #303330;text-decoration:none;font-size:13px;font-weight:700}
+.kp-form-title-row{display:flex;align-items:center;gap:14px}.kp-form-title-icon{width:52px;height:52px;display:grid;place-items:center;background:#efd46d;border:3px solid #303330;border-radius:14px;box-shadow:0 3px 0 #303330;flex:0 0 auto}
+.kp-form-title-row small{display:block;margin-bottom:3px;color:#858983;font-size:10px;font-weight:800;letter-spacing:.14em}.kp-form-header .kp-form-title-row h1{margin:0;color:#303330;font-size:clamp(26px,3vw,36px);font-weight:800;letter-spacing:-.04em}
+.kp-form-meta{display:inline-flex;flex-wrap:wrap;gap:5px;margin:18px 0 0 66px;padding:7px 11px;background:#f4f2ed;color:#686d67;border:2px solid #303330;border-radius:9px;font-family:inherit;font-size:12px}
+@media(max-width:700px){.kp-form-header{padding:18px}.kp-form-meta{margin-left:0}.kp-form-title-icon{width:46px;height:46px}}

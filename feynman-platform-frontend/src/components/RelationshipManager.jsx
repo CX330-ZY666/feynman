@@ -4,12 +4,12 @@ import apiClient from '../api/axios';
 // 关系类型配置
 const RELATION_TYPES = [
     { value: 'prerequisite', label: '前置知识', icon: '⬅️', color: '#ff4444', desc: '当前知识点依赖于目标' },
-    { value: 'derived', label: '派生', icon: '🌿', color: '#44ff44', desc: '当前知识点从目标派生而来' },
-    { value: 'similar', label: '相似', icon: '🔄', color: '#4444ff', desc: '两者概念相似' },
+    { value: 'derived', label: '派生', icon: '', color: '#44ff44', desc: '当前知识点从目标派生而来' },
+    { value: 'similar', label: '相似', icon: '', color: '#4444ff', desc: '两者概念相似' },
     { value: 'contrast', label: '对比', icon: '⚖️', color: '#ffaa00', desc: '两者形成对比关系' },
-    { value: 'application', label: '应用', icon: '🎯', color: '#ff44ff', desc: '当前知识点应用于目标' },
-    { value: 'includes', label: '包含', icon: '📦', color: '#44ffff', desc: '当前知识点包含目标' },
-    { value: 'reference', label: '引用', icon: '🔗', color: '#aaaaaa', desc: '当前知识点引用目标' }
+    { value: 'application', label: '应用', icon: '', color: '#ff44ff', desc: '当前知识点应用于目标' },
+    { value: 'includes', label: '包含', icon: '', color: '#44ffff', desc: '当前知识点包含目标' },
+    { value: 'reference', label: '引用', icon: '', color: '#aaaaaa', desc: '当前知识点引用目标' }
 ];
 
 function RelationshipManager({ currentKpId, onRelationsChange }) {
@@ -123,13 +123,13 @@ function RelationshipManager({ currentKpId, onRelationsChange }) {
             border: '1px solid #e0e0e0'
         }}>
             <h3 style={{ marginTop: 0, marginBottom: '15px', color: '#333' }}>
-                🔗 关系管理
+                 关系管理
             </h3>
 
             {/* 关系类型说明 */}
             <details style={{ marginBottom: '20px' }}>
                 <summary style={{ cursor: 'pointer', fontWeight: 'bold', color: '#666' }}>
-                    📖 关系类型说明
+                     关系类型说明
                 </summary>
                 <div style={{
                     marginTop: '10px',
@@ -186,7 +186,7 @@ function RelationshipManager({ currentKpId, onRelationsChange }) {
                                         </div>
                                         {rel.description && (
                                             <div style={{ fontSize: '12px', color: '#666', marginLeft: '25px' }}>
-                                                💬 {rel.description}
+                                                 {rel.description}
                                             </div>
                                         )}
                                         <div style={{ fontSize: '11px', color: '#999', marginLeft: '25px' }}>

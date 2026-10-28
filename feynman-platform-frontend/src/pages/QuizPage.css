@@ -476,3 +476,10 @@
   flex: 1;
   padding: 1rem;
 }
+
+/* 2026 unified assessment header */
+.quiz-header{padding:22px 24px 24px!important;background:#fffefa!important;color:#303330!important;border:3px solid #303330!important;border-radius:20px!important;box-shadow:0 5px 0 #303330!important}
+.quiz-header .back-link{display:inline-flex;align-items:center;gap:6px;margin-bottom:20px;padding:7px 11px;background:#e5eef2;color:#303330;border:2px solid #303330;border-radius:9px;box-shadow:0 2px 0 #303330;font-size:13px;font-weight:700}
+.quiz-header .back-link:hover{color:#303330;background:#d9e7ec}.quiz-title-row{display:flex;align-items:center;gap:14px}.quiz-title-icon{width:52px;height:52px;display:grid;place-items:center;flex:0 0 auto;background:#f4e7aa;border:3px solid #303330;border-radius:14px;box-shadow:0 3px 0 #303330}
+.quiz-title-row small{display:block;margin-bottom:3px;color:#858983;font-size:10px;font-weight:800;letter-spacing:.14em}.quiz-header .quiz-title-row h1,.quiz-header .quiz-title-row h1 span,.quiz-header .quiz-title-row .kp-title{color:#303330!important;-webkit-text-fill-color:#303330!important}.quiz-header .quiz-title-row h1{margin:0;font-size:clamp(24px,2.7vw,34px);font-weight:800;letter-spacing:-.04em}
+@media(max-width:700px){.quiz-header{padding:18px!important}.quiz-title-icon{width:46px;height:46px}}

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import apiClient from '../api/axios';
 import VoiceRecorder from '../components/VoiceRecorder';
 import StagedEvaluationResult from '../components/StagedEvaluationResult';
+import AppIcon from '../components/ui/AppIconFixed.jsx';
 import './FeynmanRecordPage.css';
 
 function FeynmanRecordPage() {
@@ -18,7 +19,7 @@ function FeynmanRecordPage() {
   // 记录本次创建的 Attempt ID，用于回写AI结果
   const [attemptId, setAttemptId] = useState(null);
   
-  // 🆕 AI评价相关状态
+  //  AI评价相关状态
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [evaluationError, setEvaluationError] = useState('');
   const [originalContent, setOriginalContent] = useState(''); // 保存原始知识点内容
@@ -38,7 +39,7 @@ function FeynmanRecordPage() {
       try {
         const response = await apiClient.get(`/knowledge-points/${id}`);
         setKpTitle(response.data?.title || '');
-        setOriginalContent(response.data?.content || ''); // 🆕 同时保存原始内容
+        setOriginalContent(response.data?.content || ''); //  同时保存原始内容
       } catch (err) {
         console.warn('加载知识点失败:', err);
         setLoadError('加载知识点失败');
@@ -135,7 +136,7 @@ function FeynmanRecordPage() {
       const resp = await apiClient.post('/attempts', payload);
       const createdId = resp.data?.id || resp.data?._id;
       setAttemptId(createdId || null);
-      setSaveAttemptMsg('✅ 已保存本次复述/评价结果');
+      setSaveAttemptMsg(' 已保存本次复述/评价结果');
 
       // 保存成功后重新加载历史记录和对比
       try {
@@ -149,15 +150,15 @@ function FeynmanRecordPage() {
         console.log('对比结果:', compareRes.data);
         if (compareRes.data.hasHistory) {
           setComparison(compareRes.data);
-          console.log('✅ 已设置对比数据');
+          console.log(' 已设置对比数据');
         } else {
-          console.log('⚠️ 历史记录不足，需要至少2次复述');
+          console.log(' 历史记录不足，需要至少2次复述');
         }
       } catch (err) {
         console.error('重新加载历史对比失败:', err);
       }
     } catch (e) {
-      setSaveAttemptMsg(`❌ 保存失败：${e?.response?.data?.msg || e?.message || '未知错误'}`);
+      setSaveAttemptMsg(` 保存失败：${e?.response?.data?.msg || e?.message || '未知错误'}`);
     } finally {
       setIsSavingAttempt(false);
     }
@@ -167,24 +168,24 @@ function FeynmanRecordPage() {
     <div className="feynman-container">
       {/* 页面头部 */}
       <div className="feynman-header">
-        <Link to="/" className="back-link">← 返回列表</Link>
-        <h1>🎤 复述知识点: <span className="kp-title">{kpTitle}</span></h1>
+        <Link to="/" className="back-link"><AppIcon name="back" size={18} accent="#A9BED3" />返回列表</Link>
+        <div className="feynman-title-row"><span className="feynman-title-icon"><AppIcon name="microphone" size={28} accent="#E99AA8" /></span><div><small>FEYNMAN RETELLING</small><h1>语音复述：<span className="kp-title">{kpTitle || '正在加载知识点...'}</span></h1></div></div>
         {historyAttempts.length > 0 && (
           <button
             onClick={() => setShowHistory(!showHistory)}
             className="btn-history"
           >
-            📜 {showHistory ? '隐藏' : '查看'}历史记录 ({historyAttempts.length})
+             {showHistory ? '隐藏' : '查看'}历史记录 ({historyAttempts.length})
           </button>
         )}
       </div>
 
-      {!!loadError && <div className="feynman-error">❌ {loadError}</div>}
+      {!!loadError && <div className="feynman-error"> {loadError}</div>}
 
       {/* 历史记录展示 */}
       {showHistory && historyAttempts.length > 0 && (
         <div className="history-section">
-          <h3>📚 历史复述记录</h3>
+          <h3> 历史复述记录</h3>
           <div className="history-list">
             {historyAttempts.map((attempt, index) => (
               <div key={attempt._id || index} className="history-item">
@@ -220,23 +221,23 @@ function FeynmanRecordPage() {
           disabled={!transcribedText || transcribedText.startsWith('转录失败') || isEvaluating}
           className="btn-evaluate"
         >
-          {isEvaluating ? '⏳ 正在评估...' : '🔍 AI 三阶段评估'}
+          {isEvaluating ? '⏳ 正在评估...' : ' AI 三阶段评估'}
         </button>
         {transcribedText && !transcribedText.startsWith('转录失败') && !isEvaluating && (
-          <span className="submit-hint">💡 可先编辑转录文本，再提交评估</span>
+          <span className="submit-hint"> 可先编辑转录文本，再提交评估</span>
         )}
       </div>
 
       {/* AI反馈展示区域 */}
       <div className="feedback-section">
-        <h2>🤖 AI 教练反馈</h2>
+        <div className="feedback-heading"><span><AppIcon name="brain" size={28} accent="#C9C3DF" /></span><div><small>AI COACH REVIEW</small><h2>AI 教练反馈</h2></div></div>
         
         {isEvaluating && (
           <div className="ai-loading">
-            <div className="ai-loading-icon">🧑‍🏫</div>
+            <div className="ai-loading-icon"><AppIcon name="brain" size={34} accent="#C9C3DF" /></div>
             <p className="ai-loading-text">AI教练正在批阅您的答卷...</p>
             <p className="ai-loading-hint">预计需要 5-10 秒，请耐心等待</p>
-            <div className="ai-loading-badge">💡 正在分析您的表述、润色文本、评估质量...</div>
+            <div className="ai-loading-badge"> 正在分析您的表述、润色文本、评估质量...</div>
           </div>
         )}
 
@@ -244,7 +245,7 @@ function FeynmanRecordPage() {
           <div className="error-retry">
             <p>{evaluationError}</p>
             <button onClick={() => getStagedEvaluation(transcribedText)} className="btn-retry">
-              🔄 重新评价
+               重新评价
             </button>
           </div>
         )}
@@ -253,7 +254,7 @@ function FeynmanRecordPage() {
           <div>
             <div className="save-options">
               <button onClick={handleSaveAttempt} disabled={isSavingAttempt} className="btn-save">
-                {isSavingAttempt ? '⏳ 正在保存...' : '💾 保存本次结果'}
+                {isSavingAttempt ? '⏳ 正在保存...' : ' 保存本次结果'}
               </button>
               {!!saveAttemptMsg && (
                 <span className={`save-msg ${saveAttemptMsg.includes('失败') ? 'error' : 'success'}`}>
@@ -264,7 +265,7 @@ function FeynmanRecordPage() {
             <StagedEvaluationResult result={stagedResult} followUpQuestions={followUpQuestions} comparison={comparison} />
             {isLoadingFollowUp && (
               <div className="follow-up-loading">
-                <p>🤔 AI教练正在准备深度追问...</p>
+                <p> AI教练正在准备深度追问...</p>
               </div>
             )}
           </div>

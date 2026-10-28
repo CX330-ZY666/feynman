@@ -30,9 +30,9 @@ function StagedEvaluationResult({ result, followUpQuestions, comparison }) {
       <div className="stage-content">
         {activeStage === 1 && (
           <div className="stage-panel">
-            <h3>🔍 阶段1：概念提取</h3>
+            <h3> 阶段1：概念提取</h3>
             <div className="concept-section">
-              <h4>✅ 已提及概念 ({stage1.coveredConcepts.length})</h4>
+              <h4> 已提及概念 ({stage1.coveredConcepts.length})</h4>
               <div className="concept-tags">
                 {stage1.coveredConcepts.map((c, i) => (
                   <span key={i} className="tag covered">{c}</span>
@@ -40,7 +40,7 @@ function StagedEvaluationResult({ result, followUpQuestions, comparison }) {
               </div>
             </div>
             <div className="concept-section">
-              <h4>❌ 遗漏概念 ({stage1.missedConcepts.length})</h4>
+              <h4> 遗漏概念 ({stage1.missedConcepts.length})</h4>
               <div className="concept-tags">
                 {stage1.missedConcepts.map((c, i) => (
                   <span key={i} className="tag missed">{c}</span>
@@ -53,7 +53,7 @@ function StagedEvaluationResult({ result, followUpQuestions, comparison }) {
 
         {activeStage === 2 && (
           <div className="stage-panel">
-            <h3>🧩 阶段2：逻辑结构评分</h3>
+            <h3> 阶段2：逻辑结构评分</h3>
             <div className="logic-score">
               <div className="score-circle">{stage2.logicScore}</div>
               <p>逻辑结构得分</p>
@@ -73,28 +73,28 @@ function StagedEvaluationResult({ result, followUpQuestions, comparison }) {
 
         {activeStage === 3 && (
           <div className="stage-panel">
-            <h3>⚠️ 阶段3：误区诊断</h3>
+            <h3> 阶段3：误区诊断</h3>
             {stage3.misconceptions.length > 0 ? (
               <div className="misconceptions">
                 {stage3.misconceptions.map((m, i) => (
                   <div key={i} className="misconception-card">
-                    <div className="misconception-point">❌ {m.point}</div>
-                    <div className="misconception-correction">✅ {m.correction}</div>
+                    <div className="misconception-point"> {m.point}</div>
+                    <div className="misconception-correction"> {m.correction}</div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="no-misconceptions">🎉 未发现理解误区</div>
+              <div className="no-misconceptions"> 未发现理解误区</div>
             )}
             <div className="strengths-suggestions">
               <div className="strengths">
-                <h4>👍 优点</h4>
+                <h4> 优点</h4>
                 <ul>
                   {stage3.strengths.map((s, i) => <li key={i}>{s}</li>)}
                 </ul>
               </div>
               <div className="suggestions">
-                <h4>💡 建议</h4>
+                <h4> 建议</h4>
                 <ul>
                   {stage3.suggestions.map((s, i) => <li key={i}>{s}</li>)}
                 </ul>
@@ -118,7 +118,7 @@ function StagedEvaluationResult({ result, followUpQuestions, comparison }) {
 
       {followUpQuestions && followUpQuestions.questions && (
         <div className="follow-up-section">
-          <h3>🤔 深度追问</h3>
+          <h3> 深度追问</h3>
           <p className="follow-up-hint">针对您的薄弱环节，AI教练为您准备了以下问题：</p>
           <div className="follow-up-questions">
             {followUpQuestions.questions.map((q, i) => (
@@ -136,7 +136,7 @@ function StagedEvaluationResult({ result, followUpQuestions, comparison }) {
 
       {comparison && comparison.hasHistory && (
         <div className="comparison-section">
-          <h3>📈 学习进步分析</h3>
+          <h3> 学习进步分析</h3>
           <div className="score-change">
             <span className="change-label">得分变化：</span>
             <span className={`change-value ${comparison.scoreChange >= 0 ? 'positive' : 'negative'}`}>
@@ -146,7 +146,7 @@ function StagedEvaluationResult({ result, followUpQuestions, comparison }) {
           <div className="comparison-grid">
             {comparison.improvements.length > 0 && (
               <div className="comparison-card improvements">
-                <h4>✅ 进步之处</h4>
+                <h4> 进步之处</h4>
                 <ul>
                   {comparison.improvements.map((item, i) => <li key={i}>{item}</li>)}
                 </ul>
@@ -154,7 +154,7 @@ function StagedEvaluationResult({ result, followUpQuestions, comparison }) {
             )}
             {comparison.regressions.length > 0 && (
               <div className="comparison-card regressions">
-                <h4>⚠️ 需要注意</h4>
+                <h4> 需要注意</h4>
                 <ul>
                   {comparison.regressions.map((item, i) => <li key={i}>{item}</li>)}
                 </ul>
@@ -163,7 +163,7 @@ function StagedEvaluationResult({ result, followUpQuestions, comparison }) {
           </div>
           {comparison.suggestions.length > 0 && (
             <div className="comparison-suggestions">
-              <h4>💡 改进建议</h4>
+              <h4> 改进建议</h4>
               <ul>
                 {comparison.suggestions.map((item, i) => <li key={i}>{item}</li>)}
               </ul>
