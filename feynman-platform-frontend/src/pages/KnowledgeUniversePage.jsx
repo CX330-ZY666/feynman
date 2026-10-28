@@ -1421,7 +1421,7 @@ function KnowledgeUniversePage() {
     }
 
     return (
-        <div style={{ width: '100%', height: 'calc(100vh - 48px)', position: 'relative', overflow: 'hidden' }}>
+        <div className="immersive-universe-root" style={{ width: '100%', height: 'calc(100vh - 48px)', position: 'relative', overflow: 'hidden' }}>
             <div ref={mountRef} style={{ width: '100%', height: '100%' }} />
             
             {/* 搜索框 */}
@@ -1685,7 +1685,7 @@ function KnowledgeUniversePage() {
             
             {/* 详情卡片 */}
             {selectedNodeData && (
-                <div style={UI_STYLES.detailCard}>
+                <div className="immersive-mobile-detail" style={UI_STYLES.detailCard}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
                         <h3 style={{ margin: 0, fontSize: '22px', color: '#00ccff' }}>
                              {selectedNodeData.title}

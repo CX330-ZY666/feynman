@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
 import './styles/design-system.css';
+import './styles/responsive.css';
 import { HashRouter } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext.jsx'; // 引入AuthProvider
 

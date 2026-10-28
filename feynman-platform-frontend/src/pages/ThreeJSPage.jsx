@@ -921,7 +921,7 @@ function ThreeJSPage() {
             
             {/* 悬停提示卡片 */}
             {hoveredNodeData && !selectedNodeData && (
-                <div style={{
+                <div className="immersive-mobile-hover" style={{
                     position: 'fixed',
                     right: '25px',
                     top: '120px',
@@ -985,7 +985,7 @@ function ThreeJSPage() {
             
             {/* 详情卡片 */}
             {selectedNodeData && (
-                <div style={{
+                <div className="immersive-mobile-detail" style={{
                     position: 'fixed',
                     right: '25px',
                     bottom: '25px',
