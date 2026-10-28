@@ -74,6 +74,7 @@ jobs:
           fi
       - name: Upload and deploy over SSH
         if: steps.config.outputs.enabled == 'true'
+        timeout-minutes: 12
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
@@ -87,6 +88,6 @@ jobs:
           printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/feynman_deploy ~/.ssh/known_hosts
           trap 'rm -f ~/.ssh/feynman_deploy' EXIT
-          SSH_OPTS=(-i ~/.ssh/feynman_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=20)
-          scp "${SSH_OPTS[@]}" feynman-release.zip "${DEPLOY_USER}@${DEPLOY_HOST}:C:/apps/feynman/incoming/release-${GITHUB_SHA}.zip"
+          SSH_OPTS=(-i ~/.ssh/feynman_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=20 -o ServerAliveInterval=15 -o ServerAliveCountMax=3)
+          scp -O "${SSH_OPTS[@]}" feynman-release.zip "${DEPLOY_USER}@${DEPLOY_HOST}:C:/apps/feynman/incoming/release-${GITHUB_SHA}.zip"
           ssh "${SSH_OPTS[@]}" "${DEPLOY_USER}@${DEPLOY_HOST}" "powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:/apps/feynman/deploy-release.ps1 -ReleaseArchive C:/apps/feynman/incoming/release-${GITHUB_SHA}.zip"
