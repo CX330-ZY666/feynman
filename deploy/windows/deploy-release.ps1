@@ -21,8 +21,8 @@ if (Test-Path "$stage\lib-manifest.json") {
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     $manifest = Get-Content -LiteralPath "$stage\lib-manifest.json" -Raw | ConvertFrom-Json
     $oldJar = [IO.Compression.ZipFile]::OpenRead($jar)
-    $slimJar = $null
-    $completeJar = $null
+    $reuse = Join-Path $stage 'reusable-libraries'
+    New-Item -ItemType Directory -Path "$reuse\BOOT-INF\lib" -Force | Out-Null
     try {
         foreach ($library in $manifest.PSObject.Properties) {
             $entry = $oldJar.GetEntry($library.Name)
@@ -33,25 +33,23 @@ if (Test-Path "$stage\lib-manifest.json") {
             finally { $stream.Dispose(); $hasher.Dispose() }
             if ($hash -ne $library.Value) { Write-Output 'Full release required: dependency changed.'; exit 42 }
         }
-        $slimJar = [IO.Compression.ZipFile]::OpenRead("$stage\backend.jar")
-        $completeJar = [IO.Compression.ZipFile]::Open("$stage\backend-complete.jar", [IO.Compression.ZipArchiveMode]::Create)
-        foreach ($entry in $slimJar.Entries) {
-            $destination = $completeJar.CreateEntry($entry.FullName, [IO.Compression.CompressionLevel]::Optimal)
-            $input = $entry.Open(); $output = $destination.Open()
-            try { $input.CopyTo($output) } finally { $input.Dispose(); $output.Dispose() }
-        }
         foreach ($library in $manifest.PSObject.Properties) {
-            # Spring Boot requires nested dependency JARs to be STORED, not DEFLATED.
-            $destination = $completeJar.CreateEntry($library.Name, [IO.Compression.CompressionLevel]::NoCompression)
-            $input = $oldJar.GetEntry($library.Name).Open(); $output = $destination.Open()
+            if ($library.Name -notmatch '^BOOT-INF/lib/[^/\\]+\.jar$') { throw 'Invalid dependency path.' }
+            $input = $oldJar.GetEntry($library.Name).Open()
+            $output = [IO.File]::Create((Join-Path $reuse $library.Name))
             try { $input.CopyTo($output) } finally { $input.Dispose(); $output.Dispose() }
         }
     } finally {
-        if ($null -ne $completeJar) { $completeJar.Dispose() }
-        if ($null -ne $slimJar) { $slimJar.Dispose() }
         $oldJar.Dispose()
     }
-    Move-Item -LiteralPath "$stage\backend-complete.jar" -Destination "$stage\backend.jar" -Force
+    # Windows PowerShell's .NET Framework emits DEFLATE even for NoCompression.
+    # Use the JDK tool to guarantee STORED nested JAR entries, as Spring Boot requires.
+    $javaTool = (Get-Command java.exe -ErrorAction Stop).Source
+    $jarTool = Join-Path (Split-Path $javaTool) 'jar.exe'
+    & $jarTool --update --no-compress --file "$stage\backend.jar" -C $reuse BOOT-INF/lib
+    if ($LASTEXITCODE -ne 0) { throw 'Could not reconstruct the executable JAR.' }
+    & $javaTool '-Djarmode=tools' '-jar' "$stage\backend.jar" | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw 'Executable JAR loader validation failed; existing application was not stopped.' }
 }
 Copy-Item -LiteralPath $jar -Destination "$backup\backend.jar"
 Copy-Item -LiteralPath $dist -Destination "$backup\dist" -Recurse
