@@ -17,6 +17,42 @@ if (-not (Test-Path "$stage\dist\index.html") -or -not (Test-Path "$stage\backen
     throw 'Release is incomplete; the running application was not changed.'
 }
 if (-not (Test-Path $jar) -or -not (Test-Path $dist)) { throw 'Existing deployment missing; complete the initial deployment first.' }
+if (Test-Path "$stage\lib-manifest.json") {
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $manifest = Get-Content -LiteralPath "$stage\lib-manifest.json" -Raw | ConvertFrom-Json
+    $oldJar = [IO.Compression.ZipFile]::OpenRead($jar)
+    $slimJar = $null
+    $completeJar = $null
+    try {
+        foreach ($library in $manifest.PSObject.Properties) {
+            $entry = $oldJar.GetEntry($library.Name)
+            if ($null -eq $entry) { Write-Output 'Full release required: dependency missing.'; exit 42 }
+            $stream = $entry.Open()
+            $hasher = [Security.Cryptography.SHA256]::Create()
+            try { $hash = ([BitConverter]::ToString($hasher.ComputeHash($stream))).Replace('-', '').ToLowerInvariant() }
+            finally { $stream.Dispose(); $hasher.Dispose() }
+            if ($hash -ne $library.Value) { Write-Output 'Full release required: dependency changed.'; exit 42 }
+        }
+        $slimJar = [IO.Compression.ZipFile]::OpenRead("$stage\backend.jar")
+        $completeJar = [IO.Compression.ZipFile]::Open("$stage\backend-complete.jar", [IO.Compression.ZipArchiveMode]::Create)
+        foreach ($entry in $slimJar.Entries) {
+            $destination = $completeJar.CreateEntry($entry.FullName, [IO.Compression.CompressionLevel]::Optimal)
+            $input = $entry.Open(); $output = $destination.Open()
+            try { $input.CopyTo($output) } finally { $input.Dispose(); $output.Dispose() }
+        }
+        foreach ($library in $manifest.PSObject.Properties) {
+            # Spring Boot requires nested dependency JARs to be STORED, not DEFLATED.
+            $destination = $completeJar.CreateEntry($library.Name, [IO.Compression.CompressionLevel]::NoCompression)
+            $input = $oldJar.GetEntry($library.Name).Open(); $output = $destination.Open()
+            try { $input.CopyTo($output) } finally { $input.Dispose(); $output.Dispose() }
+        }
+    } finally {
+        if ($null -ne $completeJar) { $completeJar.Dispose() }
+        if ($null -ne $slimJar) { $slimJar.Dispose() }
+        $oldJar.Dispose()
+    }
+    Move-Item -LiteralPath "$stage\backend-complete.jar" -Destination "$stage\backend.jar" -Force
+}
 Copy-Item -LiteralPath $jar -Destination "$backup\backend.jar"
 Copy-Item -LiteralPath $dist -Destination "$backup\dist" -Recurse
 

@@ -45,13 +45,7 @@ jobs:
         working-directory: feynman-platform-springboot
         run: mvn -B --no-transfer-progress package
       - name: Create release archive
-        run: |
-          mkdir -p release
-          cp -R feynman-platform-frontend/dist release/dist
-          cp feynman-platform-springboot/target/feynman-platform-springboot-0.0.1-SNAPSHOT.jar release/backend.jar
-          printf '%s\n' "$GITHUB_SHA" > release/revision.txt
-          cd release
-          zip -qr ../feynman-release.zip .
+        run: python3 deploy/build-release.py "$GITHUB_SHA"
       - name: Save downloadable release
         uses: actions/upload-artifact@v4
         with:
@@ -74,7 +68,7 @@ jobs:
           fi
       - name: Upload and deploy over SSH
         if: steps.config.outputs.enabled == 'true'
-        timeout-minutes: 12
+        timeout-minutes: 20
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
@@ -89,5 +83,16 @@ jobs:
           chmod 600 ~/.ssh/feynman_deploy ~/.ssh/known_hosts
           trap 'rm -f ~/.ssh/feynman_deploy' EXIT
           SSH_OPTS=(-i ~/.ssh/feynman_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=20 -o ServerAliveInterval=15 -o ServerAliveCountMax=3)
-          scp -O "${SSH_OPTS[@]}" feynman-release.zip "${DEPLOY_USER}@${DEPLOY_HOST}:C:/apps/feynman/incoming/release-${GITHUB_SHA}.zip"
-          ssh "${SSH_OPTS[@]}" "${DEPLOY_USER}@${DEPLOY_HOST}" "powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:/apps/feynman/deploy-release.ps1 -ReleaseArchive C:/apps/feynman/incoming/release-${GITHUB_SHA}.zip"
+          scp -O "${SSH_OPTS[@]}" deploy/windows/deploy-release.ps1 "${DEPLOY_USER}@${DEPLOY_HOST}:C:/apps/feynman/incoming/deploy-${GITHUB_SHA}.ps1"
+          scp -O "${SSH_OPTS[@]}" feynman-release-slim.zip "${DEPLOY_USER}@${DEPLOY_HOST}:C:/apps/feynman/incoming/release-${GITHUB_SHA}.zip"
+          set +e
+          ssh "${SSH_OPTS[@]}" "${DEPLOY_USER}@${DEPLOY_HOST}" "powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:/apps/feynman/incoming/deploy-${GITHUB_SHA}.ps1 -ReleaseArchive C:/apps/feynman/incoming/release-${GITHUB_SHA}.zip"
+          result=$?
+          set -e
+          if [[ "$result" == 42 ]]; then
+            echo 'Dependencies changed; uploading the full release.'
+            scp -O "${SSH_OPTS[@]}" feynman-release.zip "${DEPLOY_USER}@${DEPLOY_HOST}:C:/apps/feynman/incoming/full-${GITHUB_SHA}.zip"
+            ssh "${SSH_OPTS[@]}" "${DEPLOY_USER}@${DEPLOY_HOST}" "powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:/apps/feynman/incoming/deploy-${GITHUB_SHA}.ps1 -ReleaseArchive C:/apps/feynman/incoming/full-${GITHUB_SHA}.zip"
+          elif [[ "$result" != 0 ]]; then
+            exit "$result"
+          fi
