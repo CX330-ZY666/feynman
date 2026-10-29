@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import apiClient from '../api/axios';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
 import AppIcon from '../components/ui/AppIconFixed.jsx';
 import './AuthPage.css';
 
@@ -13,9 +14,9 @@ function RegisterPage() {
     confirmPassword: ''
   });
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -37,8 +38,8 @@ function RegisterPage() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (loading) return;
     setError('');
-    setSuccess('');
 
     if (formData.password !== formData.confirmPassword) {
       setError('两次输入的密码不一致');
@@ -52,13 +53,21 @@ function RegisterPage() {
 
     setLoading(true);
     try {
-      await apiClient.post('/users/register', {
+      const response = await apiClient.post('/users/register', {
         username: formData.username,
         email: formData.email,
         password: formData.password
       });
-      setSuccess('注册成功！正在跳转登录页面...');
-      setTimeout(() => navigate('/login'), 1500);
+      const { token } = response.data || {};
+      if (!token) {
+        setError('账号已创建，但未收到登录凭证，请点击下方“返回登录”继续。');
+        return;
+      }
+      login(token, response.data?.user || {
+        username: formData.username.trim(),
+        email: formData.email.trim().toLowerCase(),
+      });
+      navigate('/', { replace: true });
     } catch (err) {
       setError(err.response?.data?.msg || '注册失败，请稍后重试');
     } finally {
@@ -80,12 +89,6 @@ function RegisterPage() {
             {error && (
               <div className="auth-error">
                 <span></span> {error}
-              </div>
-            )}
-            
-            {success && (
-              <div className="auth-success">
-                <span></span> {success}
               </div>
             )}
             
