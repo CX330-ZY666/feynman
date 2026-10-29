@@ -39,6 +39,17 @@ public class GuestQuotaService {
         use("ai-global:"+now.toLocalDate(),settings.dailyAiLimit(),now.plusDays(2));
     }
     @Transactional(propagation=Propagation.REQUIRES_NEW)
+    public void reserveEvaluation(String userId,String ipHash) {
+        var now=LocalDateTime.now(ZoneOffset.UTC);
+        use("evaluation-user:"+userId,1,now.plusDays(2));
+        use("ai-ip:"+ipHash+":"+now.toLocalDate(),6,now.plusDays(2));
+        use("ai-global:"+now.toLocalDate(),settings.dailyAiLimit(),now.plusDays(2));
+    }
+    public int evaluationRemaining(String userId) {
+        Integer used=mapper.count("evaluation-user:"+userId);
+        return Math.max(0,1-(used==null?0:used));
+    }
+    @Transactional(propagation=Propagation.REQUIRES_NEW)
     public void reserveWrite(String userId) {
         var now=LocalDateTime.now(ZoneOffset.UTC);
         use("write-user:"+userId+":"+now.toLocalDate(),100,now.plusDays(2));

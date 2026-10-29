@@ -21,7 +21,14 @@ public class GuestAccessInterceptor implements HandlerInterceptor {
         if("GET".equals(request.getMethod())||"OPTIONS".equals(request.getMethod()))return true;
         if(request.getContentLengthLong()>16_384)throw denied("体验模式仅支持短文本，请缩短内容，或注册正式账号");
         if(AI.contains(path)&&"POST".equals(request.getMethod())) {
-            quotas.reserveAi(user.getId(),quotas.ipHash(GuestClientAddress.from(request)));
+            if(path.equals("/api/feynman-practice/summary")) {
+                // This endpoint builds a local summary and never calls a model.
+                quotas.reserveWrite(user.getId());
+            } else if(path.equals("/api/feynman-practice/evaluate-understanding")) {
+                quotas.reserveEvaluation(user.getId(),quotas.ipHash(GuestClientAddress.from(request)));
+            } else {
+                quotas.reserveAi(user.getId(),quotas.ipHash(GuestClientAddress.from(request)));
+            }
             response.setHeader("X-Guest-AI-Remaining",String.valueOf(quotas.remaining(user.getId())));
             return true;
         }

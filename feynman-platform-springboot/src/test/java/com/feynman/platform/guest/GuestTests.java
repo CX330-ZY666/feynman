@@ -65,6 +65,17 @@ class GuestTests {
         guest.setGuest(false);assertTrue(new GuestAccessInterceptor(quota,settings).preHandle(request("/api/audio/transcribe"),new MockHttpServletResponse(),new Object()));
         verifyNoInteractions(quota);
     }
+    @Test void summaryIsFreeAndFinalEvaluationUsesSeparateBudget(){
+        when(quota.ipHash(anyString())).thenReturn("test-ip-hash");
+        var interceptor=new GuestAccessInterceptor(quota,settings);
+        assertTrue(interceptor.preHandle(request("/api/feynman-practice/summary"),new MockHttpServletResponse(),new Object()));
+        verify(quota).reserveWrite(guest.getId());
+        verify(quota,never()).reserveAi(anyString(),anyString());
+        verify(quota,never()).reserveEvaluation(anyString(),anyString());
+        assertTrue(interceptor.preHandle(request("/api/feynman-practice/evaluate-understanding"),new MockHttpServletResponse(),new Object()));
+        verify(quota).reserveEvaluation(eq(guest.getId()),anyString());
+        verify(quota,never()).reserveAi(anyString(),anyString());
+    }
     @Test void inputSizeAndProviderCallCapsAreEnforced(){
         var request=request("/api/ai/rag-qa");request.setContent(new byte[17000]);
         assertThrows(ApiException.class,()->new GuestAccessInterceptor(quota,settings).preHandle(request,new MockHttpServletResponse(),new Object()));
