@@ -43,6 +43,7 @@ public class UnifiedSecurityConfiguration {
                                 "/actuator/health",
                                 "/api/health",
                                 "/api/users/register",
+                                "/api/users/guest",
                                 "/api/users/login",
                                 "/api/users/refresh"
                         ).permitAll()
@@ -67,7 +68,7 @@ public class UnifiedSecurityConfiguration {
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of(HttpHeaders.AUTHORIZATION, HttpHeaders.CONTENT_TYPE, "x-auth-token"));
-        configuration.setExposedHeaders(List.of(HttpHeaders.CONTENT_TYPE));
+        configuration.setExposedHeaders(List.of(HttpHeaders.CONTENT_TYPE, "X-Guest-AI-Remaining"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

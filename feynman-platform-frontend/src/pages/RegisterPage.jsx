@@ -16,7 +16,7 @@ function RegisterPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, user } = useAuth();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -86,6 +86,7 @@ function RegisterPage() {
         
         <div className="auth-body">
           <form className="auth-form" onSubmit={handleSubmit}>
+            {user?.guest && <p className="guest-upgrade-note">注册成功后，将保留当前体验空间的知识点和学习记录。</p>}
             {error && (
               <div className="auth-error">
                 <span></span> {error}

@@ -12,6 +12,9 @@ public class UserEntity {
     private String email;
     private String password;
     private int authVersion;
+    private boolean guest;
+    @com.baomidou.mybatisplus.annotation.TableField(updateStrategy = com.baomidou.mybatisplus.annotation.FieldStrategy.ALWAYS)
+    private LocalDateTime guestExpiresAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

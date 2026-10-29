@@ -34,11 +34,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 String userId = jwtService.parseAccessToken(token);
                 var user = userMapper.selectById(userId);
-                if (user == null || user.getAuthVersion() != jwtService.tokenVersion(token, false)) {
+                if (user == null || user.getAuthVersion() != jwtService.tokenVersion(token, false)
+                        || (user.isGuest() && (user.getGuestExpiresAt() == null || !user.getGuestExpiresAt().isAfter(java.time.LocalDateTime.now(java.time.ZoneOffset.UTC))))) {
                     throw new IllegalArgumentException("Session revoked");
                 }
                 var authentication = new UsernamePasswordAuthenticationToken(userId, null, List.of());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                request.setAttribute("feynman.authenticatedUser", user);
             } catch (JwtException | IllegalArgumentException ignored) {
                 SecurityContextHolder.clearContext();
             }

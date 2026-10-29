@@ -5,6 +5,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import AppIcon from '../components/ui/AppIconFixed.jsx';
 import './AuthPage.css';
+import '../components/GuestBanner.css';
 
 function LoginPage() {
   const [formData, setFormData] = useState({
@@ -13,8 +14,22 @@ function LoginPage() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [guestLoading, setGuestLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  const handleGuest = async () => {
+    if (loading || guestLoading) return;
+    setGuestLoading(true); setError('');
+    try {
+      const { data } = await apiClient.post('/users/guest');
+      if (!data?.token) throw new Error('体验服务响应异常，请稍后重试');
+      localStorage.removeItem('refreshToken');
+      login(data.token, { username: '体验访客', guest: true });
+      navigate('/', { replace: true });
+    } catch (err) { setError(err.response?.data?.msg || err.message || '暂时无法进入体验，请稍后重试'); }
+    finally { setGuestLoading(false); }
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -53,7 +68,7 @@ function LoginPage() {
           <p>登录你的账户继续学习</p>
         </div>
         
-        <div className="auth-body">
+        <div className="auth-body guest-login-body">
           <form className="auth-form" onSubmit={handleSubmit}>
             {error && (
               <div className="auth-error">
@@ -85,7 +100,7 @@ function LoginPage() {
               />
             </div>
             
-            <button type="submit" className="auth-submit" disabled={loading}>
+            <button type="submit" className="auth-submit" disabled={loading || guestLoading}>
               {loading ? (
                 <span className="auth-loading">登录中</span>
               ) : (
@@ -93,6 +108,13 @@ function LoginPage() {
               )}
             </button>
           </form>
+          <section className="guest-entry" aria-label="免注册体验">
+            <span>先了解一下？无需填写邮箱和密码</span>
+            <button type="button" className="guest-entry-button" disabled={loading || guestLoading} onClick={handleGuest}>
+              <AppIcon name="book" size={21} accent="#A8D1D3" />{guestLoading ? '正在准备独立体验空间…' : '免注册，立即体验'}
+            </button>
+            <small>含示例知识点 · 临时数据保留24小时 · AI请求次数有限<br />请勿录入敏感资料；注册后可保留当前体验数据。</small>
+          </section>
         </div>
         
         <div className="auth-footer">

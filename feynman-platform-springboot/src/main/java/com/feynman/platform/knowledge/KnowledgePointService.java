@@ -19,19 +19,23 @@ public class KnowledgePointService {
     private final KnowledgePointMapper knowledgePointMapper;
     private final KnowledgePointTagMapper tagMapper;
     private final UserIdGenerator idGenerator;
+    private final com.feynman.platform.user.UserMapper users;
 
     public KnowledgePointService(
             KnowledgePointMapper knowledgePointMapper,
             KnowledgePointTagMapper tagMapper,
-            UserIdGenerator idGenerator
+            UserIdGenerator idGenerator,
+            com.feynman.platform.user.UserMapper users
     ) {
         this.knowledgePointMapper = knowledgePointMapper;
         this.tagMapper = tagMapper;
         this.idGenerator = idGenerator;
+        this.users = users;
     }
 
     @Transactional
     public KnowledgePointResponse create(String userId, CreateKnowledgePointRequest request) {
+        checkGuestContent(userId, request.title(), request.content(), true);
         KnowledgePointEntity entity = new KnowledgePointEntity();
         entity.setId(idGenerator.nextId());
         entity.setTitle(request.title().trim());
@@ -70,6 +74,7 @@ public class KnowledgePointService {
 
     @Transactional
     public KnowledgePointResponse update(String userId, String id, UpdateKnowledgePointRequest request) {
+        checkGuestContent(userId, request.title(), request.content(), false);
         KnowledgePointEntity entity = owned(userId, id);
         setIfNotNull(request.title(), value -> entity.setTitle(value.trim()));
         setIfNotNull(request.content(), entity::setContent);
@@ -91,6 +96,20 @@ public class KnowledgePointService {
         owned(userId, id);
         knowledgePointMapper.deleteAttempts(id);
         knowledgePointMapper.deleteById(id);
+    }
+
+    private void checkGuestContent(String userId, String title, String content, boolean creating) {
+        var user = users.selectById(userId);
+        if (user == null || !user.isGuest()) return;
+        user = users.lockById(userId);
+        if (user == null) throw new ApiException(HttpStatus.UNAUTHORIZED, "GUEST_EXPIRED", "体验已结束，请重新进入或注册正式账号");
+        if (!user.isGuest()) return;
+        if ((title != null && title.length() > 100) || (content != null && content.length() > 3000)) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "GUEST_CONTENT_LIMIT", "体验模式标题最多100字、正文最多3000字符，请缩短内容或注册正式账号");
+        }
+        if (creating && knowledgePointMapper.selectCount(new LambdaQueryWrapper<KnowledgePointEntity>().eq(KnowledgePointEntity::getAuthorId,userId)) >= 5) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "GUEST_KNOWLEDGE_LIMIT", "体验模式最多保留5个知识点，请先删除示例或注册正式账号");
+        }
     }
 
     @Transactional

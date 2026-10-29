@@ -25,6 +25,7 @@ export default function AccountPage() {
     finally { setBusy(''); }
   };
   const signOut = () => { logout(); navigate('/login', { replace: true }); };
+  if (user?.guest) return <div className="account-page"><section className="account-panel"><h1>体验账号</h1><p>当前空间独立保存，24小时后到期清理。注册可保留知识点和学习记录。</p><p>在线语音转写、文件导入和账号安全管理需要正式账号。</p><Link to="/register">注册并保留体验数据</Link><button type="button" onClick={signOut}>退出体验</button></section></div>;
   return <div className="account-page">
     <header className="account-heading"><span><AppIcon name="user" size={30} accent="#BCD4BF" /></span><div><h1>账号设置</h1><p>管理个人资料和账号安全</p></div><Link to="/">返回学习首页</Link></header>
     <div className="account-mobile-logout"><button onClick={signOut}>退出登录</button></div>

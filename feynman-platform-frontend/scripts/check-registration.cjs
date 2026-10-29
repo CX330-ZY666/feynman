@@ -32,7 +32,7 @@ const server=http.createServer((req,res)=>{
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 app.whenReady().then(async()=>{
   await new Promise(r=>server.listen(18993,'127.0.0.1',r));
-  const w=new BrowserWindow({show:false,width:390,height:844,webPreferences:{contextIsolation:true,nodeIntegration:false,backgroundThrottling:false}});
+  const w=new BrowserWindow({show:false,width:390,height:844,webPreferences:{partition:'registration-test-'+Date.now(),contextIsolation:true,nodeIntegration:false,backgroundThrottling:false}});
   w.webContents.session.webRequest.onBeforeRequest((details,callback)=>callback({cancel:/^https?:/.test(details.url)&&!details.url.startsWith('http://127.0.0.1:18993/')}));
   const js=code=>w.webContents.executeJavaScript(code,true);
   const wait=async code=>{for(let i=0;i<60;i++){if(await js(code))return;await sleep(100);}throw Error('Timed out: '+code);};

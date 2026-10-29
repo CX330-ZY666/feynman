@@ -26,6 +26,11 @@ public class UserService {
 
     @Transactional
     public TokenResponse register(RegisterRequest request) {
+        return register(request, null);
+    }
+
+    @Transactional
+    public TokenResponse register(RegisterRequest request, String signedInUserId) {
         String email = request.email().trim().toLowerCase();
         String username = request.username().trim();
         if (findByEmail(email) != null) {
@@ -35,15 +40,24 @@ public class UserService {
             throw new ApiException(HttpStatus.BAD_REQUEST, "USERNAME_EXISTS", "Username already exists");
         }
 
-        UserEntity user = new UserEntity();
-        user.setId(idGenerator.nextId());
+        UserEntity user = signedInUserId == null ? null : userMapper.lockById(signedInUserId);
+        if (signedInUserId != null && (user == null || !user.isGuest())) {
+            throw new ApiException(HttpStatus.CONFLICT, "ALREADY_REGISTERED", "当前账号已注册或体验已结束，请刷新页面后重试");
+        }
+        boolean upgrading = user != null && user.isGuest();
+        if (upgrading && (user.getGuestExpiresAt() == null || !user.getGuestExpiresAt().isAfter(LocalDateTime.now(java.time.ZoneOffset.UTC)))) {
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "GUEST_EXPIRED", "体验已过期，请重新注册正式账号");
+        }
+        if (!upgrading) { user = new UserEntity(); user.setId(idGenerator.nextId()); user.setCreatedAt(LocalDateTime.now()); }
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(request.password()));
-        user.setCreatedAt(LocalDateTime.now());
+        user.setGuest(false);
+        user.setGuestExpiresAt(null);
+        if (upgrading) user.setAuthVersion(user.getAuthVersion() + 1);
         user.setUpdatedAt(LocalDateTime.now());
         try {
-            userMapper.insert(user);
+            if (upgrading) userMapper.updateById(user); else userMapper.insert(user);
         } catch (DuplicateKeyException exception) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "USER_EXISTS", "Email or username already exists");
         }
@@ -52,7 +66,7 @@ public class UserService {
 
     public TokenResponse login(LoginRequest request) {
         UserEntity user = findByEmail(request.email().trim().toLowerCase());
-        if (user == null || !passwordEncoder.matches(request.password(), user.getPassword())) {
+        if (user == null || user.isGuest() || !passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "INVALID_CREDENTIALS", "Invalid credentials");
         }
         return issueTokens(user.getId());
@@ -61,7 +75,7 @@ public class UserService {
     public TokenResponse refresh(String refreshToken) {
         String userId = jwtService.parseRefreshToken(refreshToken);
         UserEntity user = userMapper.selectById(userId);
-        if (user == null || user.getAuthVersion() != jwtService.tokenVersion(refreshToken, true)) {
+        if (user == null || user.isGuest() || user.getAuthVersion() != jwtService.tokenVersion(refreshToken, true)) {
             throw new ApiException(HttpStatus.UNAUTHORIZED, "REFRESH_INVALID", "Invalid refresh token");
         }
         return TokenResponse.accessOnly(jwtService.createAccessToken(userId, user.getAuthVersion()));
@@ -87,6 +101,7 @@ public class UserService {
     }
 
     private void verifyPassword(UserEntity user, String password) {
+        if (user.isGuest()) throw new ApiException(HttpStatus.FORBIDDEN, "GUEST_RESTRICTED", "体验账号请先注册后管理账号安全");
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "INVALID_PASSWORD", "当前密码不正确");
         }

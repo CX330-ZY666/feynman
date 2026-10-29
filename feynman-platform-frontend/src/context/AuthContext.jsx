@@ -54,6 +54,8 @@ export function AuthProvider({ children }) {
                                 username: u.username || u.name || null,
                                 email: u.email || null,
                                 userId: u.id || u._id || user?.userId || null,
+                                guest: !!u.guest,
+                                guestExpiresAt: u.guestExpiresAt || null,
                             });
                         }
                     } catch (e) {

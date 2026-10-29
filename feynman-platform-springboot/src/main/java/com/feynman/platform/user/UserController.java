@@ -27,8 +27,11 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public TokenResponse register(@Valid @RequestBody RegisterRequest request) {
-        return userService.register(request);
+    public TokenResponse register(@Valid @RequestBody RegisterRequest request, Authentication authentication, jakarta.servlet.http.HttpServletRequest httpRequest) {
+        if (authentication == null && (httpRequest.getHeader(HttpHeaders.AUTHORIZATION) != null || httpRequest.getHeader("x-auth-token") != null)) {
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "SESSION_EXPIRED", "体验或登录状态已过期，请返回登录页后重新注册");
+        }
+        return userService.register(request, authentication == null ? null : CurrentUser.id(authentication));
     }
 
     @PostMapping("/login")

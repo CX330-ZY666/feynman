@@ -1,6 +1,6 @@
 // src/pages/AgentPage.jsx
 import { useState, useRef, useEffect } from 'react';
-import apiClient from '../api/axios';
+import { apiBaseURL } from '../api/axios';
 import AppIcon from '../components/ui/AppIconFixed.jsx';
 import './AgentPage.css';
 
@@ -32,7 +32,7 @@ function AgentPage() {
 
         try {
             console.log('[Frontend] 开始流式请求:', questionText);
-            const apiBase = import.meta.env.VITE_API_URL || 'https://feynman-backend.onrender.com/api';
+            const apiBase = apiBaseURL;
             const response = await fetch(`${apiBase}/ai/rag-qa-stream`, {
                 method: 'POST',
                 headers: {
@@ -43,9 +43,11 @@ function AgentPage() {
             });
 
             console.log('[Frontend] 响应状态:', response.status);
+            if (response.headers.get('X-Guest-AI-Remaining') != null) window.dispatchEvent(new Event('guest-usage-updated'));
             
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const failure = await response.json().catch(() => ({}));
+                throw new Error(failure.msg || `请求失败（${response.status}），请稍后重试`);
             }
 
             const reader = response.body.getReader();
@@ -117,7 +119,7 @@ function AgentPage() {
             setMessages(prev => {
                 const newMessages = [...prev];
                 if (!newMessages[newMessages.length - 1].text) {
-                    newMessages[newMessages.length - 1].text = ' 网络请求失败，请检查网络后重试。';
+                    newMessages[newMessages.length - 1].text = error.message || '网络请求失败，请检查网络后重试。';
                 }
                 return newMessages;
             });

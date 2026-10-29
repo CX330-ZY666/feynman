@@ -72,12 +72,14 @@ public class RagDeepSeekClient {
     }
 
     private HttpRequest request(String prompt, boolean stream) throws Exception {
-        Map<String, Object> body = Map.of(
+        prompt = com.feynman.platform.guest.GuestExecution.prompt(prompt);
+        Map<String, Object> body = new java.util.LinkedHashMap<>(Map.of(
                 "model", model,
                 "messages", List.of(Map.of("role", "user", "content", prompt)),
                 "temperature", 0.3,
                 "stream", stream
-        );
+        ));
+        if (com.feynman.platform.guest.GuestExecution.active()) body.put("max_tokens",1200);
         return HttpRequest.newBuilder(endpoint)
                 .timeout(Duration.ofSeconds(60))
                 .header("Content-Type", "application/json")

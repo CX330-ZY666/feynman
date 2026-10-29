@@ -42,6 +42,8 @@ public class DeepSeekClient {
     }
 
     public String chat(String prompt, double temperature, int maxTokens) {
+        prompt = com.feynman.platform.guest.GuestExecution.prompt(prompt);
+        if (com.feynman.platform.guest.GuestExecution.active()) maxTokens = Math.min(maxTokens,1200);
         Map<String, Object> body = Map.of(
                 "model", model,
                 "messages", List.of(Map.of("role", "user", "content", prompt)),

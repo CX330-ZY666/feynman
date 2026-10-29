@@ -25,6 +25,7 @@ const clearSession = () => {
 
 apiClient.interceptors.response.use(
     (response) => {
+        if (response.headers?.['x-guest-ai-remaining'] != null) window.dispatchEvent(new Event('guest-usage-updated'));
         const refreshToken = response?.data?.refreshToken;
         const path = response?.config?.url || '';
         if (refreshToken && (path.includes('/users/login') || path.includes('/users/register'))) {
@@ -33,6 +34,7 @@ apiClient.interceptors.response.use(
         return response;
     },
     async (error) => {
+        if (error.response?.headers?.['x-guest-ai-remaining'] != null) window.dispatchEvent(new Event('guest-usage-updated'));
         const originalRequest = error.config || {};
         const method = originalRequest.method?.toLowerCase();
 
