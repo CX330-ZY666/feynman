@@ -2,13 +2,18 @@ import { useEffect, useRef, useState } from 'react';
 import apiClient from '../api/axios';
 import AppIcon from './ui/AppIconFixed';
 
-// Dedicated to chat: existing VoiceRecorder consumers keep their original behavior.
+// Dedicated to chat: returns an editable draft, never sends an AI message itself.
 export default function PracticeVoiceInput({ relatedId, disabled, onText, onBusy }) {
   const [phase, setPhase] = useState('idle');
   const [seconds, setSeconds] = useState(0);
   const [error, setError] = useState('');
   const runtime = useRef({ generation: 0, recorder: null, stream: null, timer: null, controller: null, blob: null, busy: false, uploading: false, stopping: false });
   const stopRef = useRef(null);
+  const startRef = useRef(null);
+  useEffect(() => {
+    const timer = setTimeout(() => startRef.current?.(), 0);
+    return () => clearTimeout(timer);
+  }, []);
   const callbacks = useRef({ onText, onBusy });
   useEffect(() => { callbacks.current = { onText, onBusy }; }, [onText, onBusy]);
   const release = () => {
@@ -80,16 +85,17 @@ export default function PracticeVoiceInput({ relatedId, disabled, onText, onBusy
       runtime.current.busy = false;
     }
   };
+  startRef.current = start;
   return <div className="pc-voice">
     <div className="pc-voice-controls">
       {phase === 'idle' ? <button type="button" onClick={start} disabled={disabled}><AppIcon name="microphone" />开始录音</button> : <>
-        <span role="status">{phase === 'starting' ? '正在申请麦克风权限…' : phase === 'transcribing' ? '正在转写，成功后自动发送…' : `正在录音 ${seconds}s / 60s`}</span>
-        {phase === 'recording' && <button type="button" onClick={stop}>结束并发送</button>}
+        <span role="status">{phase === 'starting' ? '正在申请麦克风权限…' : phase === 'transcribing' ? '正在转写，成功后填入输入框…' : `正在录音 ${seconds}s / 60s`}</span>
+        {phase === 'recording' && <button type="button" onClick={stop}>结束录音</button>}
         <button type="button" onClick={cancel}>取消</button>
       </>}
       {phase === 'idle' && error && runtime.current.blob && <button type="button" disabled={disabled} onClick={() => { if (!runtime.current.uploading) transcribe(runtime.current.blob, ++runtime.current.generation); }}>重试转写</button>}
     </div>
     {error && <p role="alert" className="pc-error">{error}</p>}
-    <small>结束录音后自动转文字并发送；每段最长60秒，取消不会发送。</small>
+    <small>结束录音后转写到输入框，可修改后发送；每段最长60秒。</small>
   </div>;
 }

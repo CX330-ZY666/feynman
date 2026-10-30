@@ -109,6 +109,7 @@ function PracticeSession({ id }) {
   const send = async (text, retry = false, clearDraft = true) => {
     const content = text.trim();
     if (!content || lock.current || endLock.current || summaryRef.current) return;
+    if (content.length > 5000) { setNotice('讲解超过5000字，请编辑缩短后再发送。'); return; }
     lock.current = true; setThinking(true); setNotice(''); nearBottom.current = true;
     const previous = retry ? failed.current?.history : historyOf(messagesRef.current);
     if (!previous) { lock.current = false; setThinking(false); return; }
@@ -169,7 +170,7 @@ function PracticeSession({ id }) {
         {summary && <p className="pc-status">本次练习已结束。<button onClick={() => setShowSummary(true)}>查看总结与评估</button></p>}
         <div className="pc-compose-row">
           <button type="button" className="pc-mode" aria-label={voiceMode ? '切换文字输入' : '切换语音输入'} disabled={disabled} onClick={() => setVoiceMode(!voiceMode)}><AppIcon name={voiceMode ? 'edit' : 'microphone'} size={24} /></button>
-          <div className="pc-input-wrap">{voiceMode ? !user ? <p>正在确认账号状态…</p> : user.guest ? <p>体验账号暂不支持在线转写。<Link to="/register">注册并保留数据</Link>，或切回文字输入。</p> : <PracticeVoiceInput relatedId={id} disabled={thinking || ending || !!summary} onBusy={value => { voiceBusyRef.current = value; setVoiceBusy(value); }} onText={text => send(text, false, false)} /> : <>
+          <div className="pc-input-wrap">{voiceMode ? !user ? <p>正在确认账号状态…</p> : user.guest ? <p>体验账号暂不支持在线转写。<Link to="/register">注册并保留数据</Link>，或切回文字输入。</p> : <PracticeVoiceInput relatedId={id} disabled={thinking || ending || !!summary} onBusy={value => { voiceBusyRef.current = value; setVoiceBusy(value); }} onText={text => { setDraft(previous => previous.trim() ? previous + '\n' + text : text); setVoiceMode(false); setNotice('语音已转写到输入框，请检查或修改后点击发送。'); requestAnimationFrame(() => input.current?.focus()); }} /> : <>
             <label className="pc-sr-only" htmlFor="practice-message">你的讲解</label>
             <textarea id="practice-message" ref={input} rows={1} maxLength={5000} value={draft} disabled={thinking || ending || !!summary} placeholder="用自己的话讲解…" onChange={e => setDraft(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing && e.keyCode !== 229 && window.matchMedia('(min-width: 769px) and (pointer: fine)').matches) { e.preventDefault(); send(draft); } }} />
           </>}</div>
