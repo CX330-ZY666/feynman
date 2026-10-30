@@ -60,6 +60,15 @@ public class GuestQuotaService {
     }
     private void use(String key,int limit,LocalDateTime expiry) {
         mapper.ensure(key,expiry);
-        if(mapper.consume(key,Math.max(0,limit))!=1) throw new ApiException(HttpStatus.TOO_MANY_REQUESTS,"GUEST_QUOTA_EXCEEDED","体验额度或创建频率已达上限，请稍后再试，或注册/登录正式账号");
+        if(mapper.consume(key,Math.max(0,limit))!=1) {
+            String code;String message;
+            if(key.startsWith("ai-user:")){code="GUEST_AI_LIMIT";message="你的体验交流次数已用完，请注册或登录正式账号";}
+            else if(key.startsWith("evaluation-user:")){code="GUEST_EVALUATION_LIMIT";message="你的体验结束评估次数已用完，请注册或登录正式账号";}
+            else if(key.startsWith("ai-ip:")){code="GUEST_NETWORK_LIMIT";message="当前网络今天的体验AI请求已达上限（同一网络共享），不是本页面的使用次数；请明天再试或注册正式账号";}
+            else if(key.startsWith("ai-global:")){code="GUEST_SITE_LIMIT";message="网站今天的访客AI总额度已用完，请明天再试或登录正式账号";}
+            else if(key.startsWith("write-user:")){code="GUEST_WRITE_LIMIT";message="你的体验空间今天的操作次数已达上限，请注册正式账号";}
+            else {code="GUEST_CREATION_LIMIT";message="体验空间创建过于频繁或今天创建额度已用完，请稍后再试或登录正式账号";}
+            throw new ApiException(HttpStatus.TOO_MANY_REQUESTS,code,message);
+        }
     }
 }

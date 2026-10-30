@@ -90,6 +90,34 @@ class GuestTests {
         request.setRemoteAddr("127.0.0.1");request.removeHeader("X-Forwarded-For");request.addHeader("X-Forwarded-For","1.2.3.4, 203.0.113.5");
         assertEquals("203.0.113.5",GuestClientAddress.from(request));
     }
+    @Test void forwardedHeaderFilterDoesNotMergeVisitorsIntoLoopbackBucket()throws Exception{
+        for(String address:new String[]{"203.0.113.10","203.0.113.11"}){
+            var raw=new MockHttpServletRequest("POST","/api/ai/evaluate-staged");
+            raw.setRemoteAddr("127.0.0.1");raw.addHeader("X-Forwarded-For","198.51.100.1, "+address);
+            raw.addHeader("X-Forwarded-Proto","https");
+            new org.springframework.web.filter.ForwardedHeaderFilter().doFilter(raw,new MockHttpServletResponse(),(req,res)->{
+                var wrapped=(jakarta.servlet.http.HttpServletRequest)req;
+                assertNull(wrapped.getHeader("X-Forwarded-For"));
+                assertEquals(address,GuestClientAddress.from(wrapped));
+            });
+        }
+    }
+    @Test void quotaErrorsDistinguishPersonalNetworkAndSiteLimits(){
+        var mapper=mock(GuestUsageMapper.class);
+        var service=new GuestQuotaService(mapper,settings,"test-secret");
+        when(mapper.consume(anyString(),anyInt())).thenReturn(0);
+        assertEquals("GUEST_AI_LIMIT",assertThrows(ApiException.class,()->service.reserveAi("u","ip")).getCode());
+        when(mapper.consume(anyString(),anyInt())).thenReturn(1,0);
+        assertEquals("GUEST_NETWORK_LIMIT",assertThrows(ApiException.class,()->service.reserveAi("u","ip")).getCode());
+        when(mapper.consume(anyString(),anyInt())).thenReturn(1,1,0);
+        assertEquals("GUEST_SITE_LIMIT",assertThrows(ApiException.class,()->service.reserveAi("u","ip")).getCode());
+    }
+    @Test void firstRetellingEvaluationUsesNormalExchangeBudget(){
+        when(quota.ipHash(anyString())).thenReturn("visitor-hash");
+        assertTrue(new GuestAccessInterceptor(quota,settings).preHandle(request("/api/ai/evaluate-staged"),new MockHttpServletResponse(),new Object()));
+        verify(quota).reserveAi(guest.getId(),"visitor-hash");
+        verify(quota,never()).reserveEvaluation(anyString(),anyString());
+    }
     @Test void cleanupDoesNotDeleteUpgradedOrUnexpiredAccounts(){
         @SuppressWarnings("unchecked") ObjectProvider<GuestCleanup> self=mock(ObjectProvider.class);
         var cleanup=new GuestCleanup(users,mock(GuestUsageMapper.class),self);

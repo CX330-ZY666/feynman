@@ -11,7 +11,9 @@ public final class GuestClientAddress {
         while(raw instanceof HttpServletRequestWrapper wrapper && wrapper.getRequest() instanceof HttpServletRequest inner) raw=inner;
         String peer=raw.getRemoteAddr();
         if("127.0.0.1".equals(peer)||"::1".equals(peer)||"0:0:0:0:0:0:0:1".equals(peer)) {
-            String forwarded=request.getHeader("X-Forwarded-For");
+            // ForwardedHeaderFilter hides forwarded headers on its wrapper.
+            // Read the original header only after verifying the original socket peer.
+            String forwarded=raw.getHeader("X-Forwarded-For");
             if(forwarded!=null&&forwarded.length()<2048) {
                 String[] hops=forwarded.split(",");String last=hops[hops.length-1].trim();
                 if(last.matches("[0-9a-fA-F:.]{3,64}")) return last;
