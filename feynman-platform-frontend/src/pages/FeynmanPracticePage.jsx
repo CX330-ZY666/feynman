@@ -26,9 +26,6 @@ function PracticeSession({ id }) {
   const [voiceBusy, setVoiceBusy] = useState(false);
   const [notice, setNotice] = useState('');
   const [newMessages, setNewMessages] = useState(false);
-  const [weakPoints, setWeakPoints] = useState([]);
-  const [weakDraft, setWeakDraft] = useState('');
-  const [weakBusy, setWeakBusy] = useState(false);
   const [summary, setSummary] = useState(null);
   const [showSummary, setShowSummary] = useState(false);
   const live = useRef(true), lock = useRef(false), endLock = useRef(false), voiceBusyRef = useRef(false);
@@ -130,21 +127,6 @@ function PracticeSession({ id }) {
       setNotice(errorText(err));
     } finally { lock.current = false; if (live.current) setThinking(false); }
   };
-  const saveWeakPoint = async () => {
-    if (!weakDraft.trim() || weakBusy) return;
-    setWeakBusy(true);
-    try {
-      const { data } = await post('/feynman-practice/save-weak-point', { knowledgePointId: id, weakPoint: weakDraft.trim() });
-      if (live.current) { setWeakPoints(data.weakPoints || []); setWeakDraft(''); }
-    } catch (err) { if (live.current) setNotice(errorText(err)); }
-    finally { if (live.current) setWeakBusy(false); }
-  };
-  const toggleWeakPoint = async wp => {
-    try {
-      const { data } = await apiClient.put('/feynman-practice/resolve-weak-point', { knowledgePointId: id, weakPointId: wp._id });
-      if (live.current) setWeakPoints(items => items.map(item => item._id === wp._id ? data.weakPoint : item));
-    } catch (err) { if (live.current) setNotice(errorText(err)); }
-  };
   const disabled = thinking || ending || voiceBusy || !!summaryRef.current;
   if (loadError) return <section className="practice-chat pc-load"><p role="alert">{loadError}</p><Link to="/feynman-practice">返回知识点选择</Link></section>;
   if (!point) return <section className="practice-chat pc-load" aria-busy="true"><div className="ui-skeleton"><span /><span /><span /></div><p>正在准备对话…</p></section>;
@@ -158,7 +140,6 @@ function PracticeSession({ id }) {
         {messages.map(msg => <article key={msg.id} className={`pc-message pc-${msg.role}`}>
           <span className="pc-avatar"><AppIcon name={msg.role === 'ai' ? 'assistant' : 'user'} size={24} accent={msg.role === 'ai' ? '#A8D1D3' : '#EFD46D'} /></span>
           <div className="pc-message-body"><span className="pc-sender">{msg.role === 'ai' ? '小问 · AI同学' : '你'}</span><div className="pc-bubble">{msg.content}</div>
-            {msg.role === 'ai' && msg.id !== 'welcome' && <button className="pc-inline" onClick={() => { setWeakDraft(msg.content); document.querySelector('.pc-weak')?.setAttribute('open', ''); }}>标记为薄弱点</button>}
             {msg.status === 'failed' && <span className="pc-error">发送失败（重试可能再次计次） {failed.current?.message.id === msg.id && <button disabled={disabled} onClick={() => send(msg.content, true)}>重试</button>}</span>}
           </div>
         </article>)}
@@ -179,7 +160,6 @@ function PracticeSession({ id }) {
         {!voiceMode && <small>电脑 Enter 发送，Shift + Enter 换行；手机点击发送。最多5000字。</small>}
       </div>
     </div>
-    <details className="pc-weak"><summary>薄弱点记录（{weakPoints.length}）</summary><div className="pc-weak-form"><label htmlFor="weak-point">想进一步理解的问题</label><textarea id="weak-point" value={weakDraft} onChange={e => setWeakDraft(e.target.value)} maxLength={2000} /><button disabled={weakBusy || !weakDraft.trim()} onClick={saveWeakPoint}>{weakBusy ? '保存中…' : '保存薄弱点'}</button></div>{weakPoints.map(wp => <div className="pc-weak-item" key={wp._id}><span>{wp.content}</span><button onClick={() => toggleWeakPoint(wp)}>{wp.resolved ? '撤销已解决' : '我搞懂了'}</button></div>)}</details>
     {showSummary && summary && <div className="pc-overlay" onClick={e => { if (e.target === e.currentTarget) setShowSummary(false); }}><section className="pc-summary" role="dialog" aria-modal="true" aria-labelledby="pc-summary-title"><h2 id="pc-summary-title">本次练习反馈</h2><button aria-label="关闭总结" className="pc-close" autoFocus onClick={() => setShowSummary(false)}><AppIcon name="close" /></button>{summary.understandingScore != null && <p className="pc-score">理解度 {summary.understandingScore} 分</p>}<p>{summary.summary}</p><p>{summary.feedback}</p>{summary.isParroting && <p>尝试用自己的语言表达，而不只是复述原文。</p>}{[...(summary.strengths || []), ...(summary.weaknesses || []), ...(summary.suggestions || [])].map((s, i) => <p key={i}>{s}</p>)}{summary.evaluationError && <p className="pc-error" role="alert">理解度评估未完成：{summary.evaluationError}</p>}{summary.summaryError && <p className="pc-error">{summary.summaryError}</p>}<button onClick={() => setShowSummary(false)}>返回对话</button></section></div>}
   </section>;
 }

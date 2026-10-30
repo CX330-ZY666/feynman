@@ -47,6 +47,8 @@ app.whenReady().then(async()=>{
   assert.ok(await js("window.matchMedia('(min-width: 769px) and (pointer: fine)').matches"));
   await js("document.querySelector('#practice-message').dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true,cancelable:true}));document.querySelector('.pc-send').click();document.querySelector('.pc-send').click()");await wait("document.querySelectorAll('.pc-ai').length===2");assert.equal(asks.length,1);assert.equal(asks[0].conversationHistory.length,1);
   console.log('PASS: one-click text send, IME safety, duplicate-submit guard');
+  assert.equal(await js("!!document.querySelector('.pc-weak')||document.querySelector('.practice-chat').textContent.includes('标记为薄弱点')"),false);
+  console.log('PASS: manual weak-point controls are removed; ending analysis remains available');
   failNext=true;await fill('再举一个例子解释。');await js("document.querySelector('.pc-send').click()");await wait("document.querySelector('.pc-composer').textContent.includes('本地模拟AI失败')");
   const count=await js("document.querySelectorAll('.pc-user').length");await js("[...document.querySelectorAll('.pc-user button')].find(b=>b.textContent==='重试').click()");await wait("document.querySelectorAll('.pc-ai').length===3");assert.equal(await js("document.querySelectorAll('.pc-user').length"),count);
   console.log('PASS: AI failure preserves the message; retry does not duplicate it');
